@@ -14,12 +14,12 @@ class Migration(migrations.Migration):
 
     operations = [
         migrations.CreateModel(
-            name='Image',
+            name='Review',
             fields=[
                 ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('image_url', models.URLField()),
-                ('alt_text', models.CharField(blank=True, max_length=255, null=True)),
-                ('company', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='images', to='company_app.company')),
+                ('review', models.TextField()),
+                ('rating', models.FloatField(default=0.0)),
+                ('company', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='reviews', to='company_app.company')),
             ],
         ),
     ]

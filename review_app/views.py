@@ -1,39 +1,35 @@
-from django.http import JsonResponse, HttpResponse
-from .models import Review
-# from .models import Review
+from django.http import JsonResponse
+from django.views.decorators.csrf import csrf_exempt
 import json
+from .models import Review
+from company_app.models import Company
 
-# def book(request):
-#     myBooks = list(Books.objects.all().values())
-#     return JsonResponse(myBooks, safe=False)
-
-def addReview(request):
+@csrf_exempt
+def addReview(request, company_id):  # Add company_id as a parameter
     if request.method == "POST":
         try:
-            # Attempt to parse JSON first
             data = json.loads(request.body)
-            review = data.get('review')
+            review_text = data.get('review')
             rating = data.get('rating')
-            # author = data.get('author')
-            # year = data.get('year')
+
+            if not review_text:
+                return JsonResponse({"error": "Review text is required"}, status=400)
+
+            if rating is None:
+                return JsonResponse({"error": "Rating is required"}, status=400)
+
+            try:
+                company = Company.objects.get(id=company_id)  # Use company_id from URL
+            except Company.DoesNotExist:
+                return JsonResponse({"error": "Company not found"}, status=404)
+
+            review = Review(review=review_text, rating=rating, company=company)
+            review.save()
+            return JsonResponse({"message": "Review created!"})
 
         except json.JSONDecodeError:
-            # If JSON parsing fails, try request.POST (form data)
-            review = request.POST.get('review')
-            rating = request.POST.get('rating')
-            # author = request.POST.get('author')
-            # year = request.POST.get('year')
-
-        if not review:
-            return JsonResponse({"error": "Title is required"}, status=400)
-        
-        if not rating:
-            return JsonResponse({"error": "Rating is required"}, status=400)
-
-        reviews = Review(review=review, rating= rating)
-        print('reviews pring now', reviews)
-        reviews.save()
-        return JsonResponse({"message": "review created!"})
-
+            return JsonResponse({"error": "Invalid JSON"}, status=400)
+        except Exception as e:
+            return JsonResponse({"error": str(e)}, status=500)
     else:
         return JsonResponse({"error": "Invalid method"}, status=405)
