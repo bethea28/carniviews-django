@@ -1,45 +1,21 @@
 from django.db import models
 import json
-from images_app.models import Image  # Import the Image model
 
 class Company(models.Model):
-    companyInfo = models.TextField(default='{}')  # Store companyInfo as JSON object
-    hoursData = models.TextField(default='{}')  # Store hoursData as JSON object
+    name = models.CharField(max_length=255)
+    address = models.CharField(max_length=255)
+    city = models.CharField(max_length=100)
+    state = models.CharField(max_length=50)
+    zip_code = models.CharField(max_length=20)
+    hours = models.CharField(max_length=255)
+    company_type = models.CharField(max_length=100)
+    photos = models.JSONField(default=list)  # Assuming photos is a list of URLs
+    hoursData = models.JSONField(default=dict)
+    description = models.TextField(blank=True, null=True) #Added description Field
 
-    def set_companyInfo(self, info_dict):
-        """Sets the companyInfo field from a Python dictionary."""
-        self.companyInfo = json.dumps(info_dict)
 
-    def get_companyInfo(self):
-        """Returns the companyInfo field as a Python dictionary."""
-        try:
-            return json.loads(self.companyInfo)
-        except json.JSONDecodeError:
-            return {}
-
-    def set_hoursData(self, hours_dict):
-        """Sets the hoursData field from a Python dictionary."""
-        self.hoursData = json.dumps(hours_dict)
-
-    def get_hoursData(self):
-        """Returns the hoursData field as a Python dictionary."""
-        try:
-            return json.loads(self.hoursData)
-        except json.JSONDecodeError:
-            return {}
-
-    def save(self, *args, **kwargs):
-        """Override save to ensure all JSON fields are valid."""
-        try:
-            json.loads(self.companyInfo)
-        except json.JSONDecodeError:
-            self.companyInfo = '{}'
-
-        try:
-            json.loads(self.hoursData)
-        except json.JSONDecodeError:
-            self.hoursData = '{}'
-        super().save(*args, **kwargs)
+    def __str__(self):
+        return self.name
 
     def get_images(self):
         """Returns all images associated with this company."""
