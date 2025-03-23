@@ -25,7 +25,7 @@ SECRET_KEY = 'django-insecure-z2*t%bwbllrtzn3%prk5x2$uj^c75m^%(*4$+shdi-75apzxxk
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['192.168.1.161', '127.0.0.1', 'localhost']
 
 
 # Application definition
@@ -60,7 +60,9 @@ MIDDLEWARE = [
 CORS_ALLOWED_ORIGINS = [
     "http://localhost:3000",  # Replace with the actual URL of your React development server
     'exp://172.20.10.3:8081',
-    'http://localhost:8081'
+    'http://localhost:8081',
+    'exp://192.168.1.161:8081'
+    
 ]
 ROOT_URLCONF = 'carniviews-django.urls'
 
