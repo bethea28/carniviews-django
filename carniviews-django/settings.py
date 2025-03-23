@@ -40,8 +40,10 @@ INSTALLED_APPS = [
     "members_app",
     'book_app',
     'authentication_app',
-    'review_app'
-    # 'corsheaders'
+    'review_app',
+    'company_app',
+    'images_app',
+    'corsheaders'
 ]
 
 MIDDLEWARE = [
@@ -52,14 +54,14 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
-    # 'corsheaders.middleware.CorsMiddleware',
+    'corsheaders.middleware.CorsMiddleware',
 
 ]
-# CORS_ALLOWED_ORIGINS = [
-#     "http://localhost:3000",  # Replace with the actual URL of your React development server
-#     'exp://172.20.10.3:8081',
-#     'http://localhost:8081'
-# ]
+CORS_ALLOWED_ORIGINS = [
+    "http://localhost:3000",  # Replace with the actual URL of your React development server
+    'exp://172.20.10.3:8081',
+    'http://localhost:8081'
+]
 ROOT_URLCONF = 'carniviews-django.urls'
 
 TEMPLATES = [
@@ -84,12 +86,20 @@ WSGI_APPLICATION = 'carniviews-django.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/5.1/ref/settings/#databases
 
+# DATABASES = {
+#     'default': {
+#         'ENGINE': 'django.db.backends.sqlite3',
+#         'NAME': BASE_DIR / 'db.sqlite3',
+#     }
+# }
+
+
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql',
-        'NAME': 'myprojectdb',  # Replace with your local database name
-        'USER': 'myprojectuser',  # Replace with your local database user
-        'PASSWORD': 'mypassword',  # Replace with your local database user's password
+        'NAME': 'bethea28',  # Replace with your local database name
+        'USER': 'bethea28',  # Replace with your local database user
+        'PASSWORD': '',  # Replace with your local database user's password
         'HOST': 'localhost',  # Or '127.0.0.1'
         'PORT': '5432',
     }

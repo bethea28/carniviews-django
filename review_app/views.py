@@ -1,5 +1,6 @@
 from django.http import JsonResponse, HttpResponse
 from .models import Review
+# from .models import Review
 import json
 
 # def book(request):
