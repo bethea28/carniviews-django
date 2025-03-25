@@ -29,7 +29,6 @@ ALLOWED_HOSTS = ['192.168.1.161', '127.0.0.1', 'localhost']
 
 
 # Application definition
-
 INSTALLED_APPS = [
     'django.contrib.admin',
     'django.contrib.auth',
@@ -43,8 +42,37 @@ INSTALLED_APPS = [
     'review_app',
     'company_app',
     'images_app',
-    'corsheaders'
+    'corsheaders',  # Keep corsheaders
+    'django.contrib.sites',  # Required for allauth
+    'allauth',
+    'allauth.account',
+    'allauth.socialaccount',
+    'allauth.socialaccount.providers.google', # Or other providers you want
+    # 'allauth.socialaccount.providers.facebook',
+    # 'allauth.socialaccount.providers.github',
 ]
+
+SOCIALACCOUNT_PROVIDERS = {
+    'google': {
+        'SCOPE': [
+            'profile',
+            'email',
+        ],
+        'AUTH_PARAMS': {
+            'access_type': 'online',
+        },
+        'CLIENT_ID': 'YOUR_GOOGLE_CLIENT_ID',  # Replace with your client ID
+        'SECRET': 'YOUR_GOOGLE_SECRET_KEY',  # Replace with your secret key
+    },
+    # Add other providers here
+}
+
+AUTHENTICATION_BACKENDS = [
+    'django.contrib.auth.backends.ModelBackend',
+    'allauth.account.auth_backends.AuthenticationBackend',
+]
+
+SITE_ID = 1
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
@@ -55,6 +83,8 @@ MIDDLEWARE = [
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
     'corsheaders.middleware.CorsMiddleware',
+    'allauth.account.middleware.AccountMiddleware', # Add this line
+
 
 ]
 CORS_ALLOWED_ORIGINS = [
