@@ -1,7 +1,3 @@
-from django.shortcuts import render
-
-# Create your views here.
-# Import necessary modules and models
 from django.shortcuts import render, redirect
 from django.contrib import messages
 from django.contrib.auth import authenticate, login
@@ -9,14 +5,24 @@ from django.contrib.auth.decorators import login_required
 from django.contrib.auth.models import User
 from .models import *
 from django.http import JsonResponse
-from django.http import JsonResponse
 from django.views.decorators.csrf import csrf_exempt
 import json
 from google.oauth2 import id_token
 from google.auth.transport import requests
+from rest_framework_simplejwt.tokens import RefreshToken #import JWT
 
 # Replace with your Web Client ID
 CLIENT_ID ="389796448834-lokv2d5vt75qbshil74f1t6c8hrajm48.apps.googleusercontent.com",
+
+from django.http import JsonResponse
+from django.views.decorators.csrf import csrf_exempt
+import json
+
+from google.oauth2 import id_token
+from google.auth.transport import requests
+from user_app.models import CustomUser
+from rest_framework_simplejwt.tokens import RefreshToken
+
 
 def verify_google_token(token):
     """Verifies the Google ID token."""
@@ -29,30 +35,55 @@ def verify_google_token(token):
         user_id = idinfo['sub']
         email = idinfo.get('email')
         name = idinfo.get('name')
+        picture = idinfo.get('picture')
+        givenName = idinfo.get('given_name') #get given name
+        familyName = idinfo.get('family_name') # get family name
 
-        return {'user_id': user_id, 'email': email, 'name': name}
+        return {'user_id': user_id, 'email': email, 'name': name, 'picture': picture, "givenName": givenName, "familyName": familyName} #return given and family name
 
     except ValueError as e:
         print(f"Error verifying Google token: {e}")
         return None
 
+def create_jwt_for_user(user):
+    refresh = RefreshToken.for_user(user)
+    return {
+        'refresh': str(refresh),
+        'access': str(refresh.access_token),
+    }
+
 @csrf_exempt
 def googleAuth(request):
     if request.method == "POST":
+        # print('WE STARTED', request.body)
         try:
-            data = json.loads(request.body)  # Parse the JSON data
-            user_data = data.get('userData', {})  # Get the userData object
-            id_token_value = user_data.get('data', {}).get('idToken') # Corrected path
+            data = json.loads(request.body)
+            userData = data.get('userData')
+            id_token_value = userData.get('data', {}).get('idToken')
 
+            print('CHRIS NOW',id_token_value)
+            # return JsonResponse({'message': 'idToken missing'}, status=400)
             if not id_token_value:
                 return JsonResponse({'message': 'idToken missing'}, status=400)
 
             google_user_info = verify_google_token(id_token_value)
-
+            print('GETTING THESE NDAME',google_user_info)
             if google_user_info:
-                # Find or create user in your Django database
-                # Create a session or JWT
-                return JsonResponse({'message': 'Google sign-in successful', 'user': google_user_info}, status=200)
+                try:
+                    user = CustomUser.objects.get(google_id=google_user_info['user_id'])
+                except CustomUser.DoesNotExist:
+                    user = CustomUser.objects.create(
+                        google_id=google_user_info['user_id'],
+                        email=google_user_info['email'],
+                        name=google_user_info['name'],
+                        photo=google_user_info['picture'],
+                        givenName = google_user_info['givenName'], #use given name
+                        familyName = google_user_info['familyName'], #use family name
+                    )
+
+                jwt_tokens = create_jwt_for_user(user)
+                print('MY JWT IS HERE TOO,',jwt_tokens)
+                return JsonResponse({'message': 'Google sign-in successful', 'user': google_user_info, 'tokens': jwt_tokens}, status=200)
 
             else:
                 return JsonResponse({'message': 'Google sign-in failed'}, status=401)
@@ -62,8 +93,7 @@ def googleAuth(request):
 
     else:
         return JsonResponse({'message': 'Method not allowed'}, status=405)
-
-
+# ... (rest of your views)
 
 # Define a view function for the login page
 def login_page(request):

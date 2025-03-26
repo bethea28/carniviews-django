@@ -42,12 +42,13 @@ INSTALLED_APPS = [
     'review_app',
     'company_app',
     'images_app',
-    'users_app',
+    'user_app',
     'corsheaders',  # Keep corsheaders
     'django.contrib.sites',  # Required for allauth
     'allauth',
     'allauth.account',
     'allauth.socialaccount',
+    'rest_framework_simplejwt',
     'allauth.socialaccount.providers.google', # Or other providers you want
     # 'allauth.socialaccount.providers.facebook',
     # 'allauth.socialaccount.providers.github',
