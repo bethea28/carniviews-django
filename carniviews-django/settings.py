@@ -42,6 +42,7 @@ INSTALLED_APPS = [
     'review_app',
     'company_app',
     'images_app',
+    'users_app',
     'corsheaders',  # Keep corsheaders
     'django.contrib.sites',  # Required for allauth
     'allauth',

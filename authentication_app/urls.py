@@ -26,6 +26,7 @@ from . import views
 
 urlpatterns = [
     path('home/', views.home, name='home'),
+    path('googleAuth/', views.googleAuth, name='googleAuth'),
     path('register/', views.register_page, name='register_page'),
     path('', views.login_page, name='login_page'),
 ]
