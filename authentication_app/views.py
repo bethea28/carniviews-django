@@ -55,14 +55,13 @@ def create_jwt_for_user(user):
 @csrf_exempt
 def googleAuth(request):
     if request.method == "POST":
-        # print('WE STARTED', request.body)
         try:
             data = json.loads(request.body)
             userData = data.get('userData')
             id_token_value = userData.get('data', {}).get('idToken')
 
             print('CHRIS NOW',id_token_value)
-            # return JsonResponse({'message': 'idToken missing'}, status=400)
+
             if not id_token_value:
                 return JsonResponse({'message': 'idToken missing'}, status=400)
 
@@ -70,16 +69,20 @@ def googleAuth(request):
             print('GETTING THESE NDAME',google_user_info)
             if google_user_info:
                 try:
-                    user = CustomUser.objects.get(google_id=google_user_info['user_id'])
+                    user = CustomUser.objects.get(email=google_user_info['email']) #get user by email.
                 except CustomUser.DoesNotExist:
-                    user = CustomUser.objects.create(
-                        google_id=google_user_info['user_id'],
-                        email=google_user_info['email'],
-                        name=google_user_info['name'],
-                        photo=google_user_info['picture'],
-                        givenName = google_user_info['givenName'], #use given name
-                        familyName = google_user_info['familyName'], #use family name
-                    )
+                    try:
+                        user = CustomUser.objects.create_user( #use create_user, and set username to email.
+                            email=google_user_info['email'],
+                            username=google_user_info['email'],
+                            google_id=google_user_info['user_id'],
+                            name=google_user_info['name'],
+                            photo=google_user_info['picture'],
+                            givenName = google_user_info['givenName'],
+                            familyName = google_user_info['familyName'],
+                        )
+                    except IntegrityError: #handle duplicate email.
+                        return JsonResponse({'message': 'Email already exists'}, status=400)
 
                 jwt_tokens = create_jwt_for_user(user)
                 print('MY JWT IS HERE TOO,',jwt_tokens)
@@ -93,8 +96,6 @@ def googleAuth(request):
 
     else:
         return JsonResponse({'message': 'Method not allowed'}, status=405)
-# ... (rest of your views)
-
 # Define a view function for the login page
 def login_page(request):
     # Check if the HTTP request method is POST (form submission)
