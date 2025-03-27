@@ -9,6 +9,7 @@ https://docs.djangoproject.com/en/5.1/topics/settings/
 For the full list of settings and their values, see
 https://docs.djangoproject.com/en/5.1/ref/settings/
 """
+from datetime import timedelta
 
 from pathlib import Path
 
@@ -48,6 +49,7 @@ INSTALLED_APPS = [
     'allauth',
     'allauth.account',
     'allauth.socialaccount',
+    'rest_framework',
     'rest_framework_simplejwt',
     'allauth.socialaccount.providers.google', # Or other providers you want
     # 'allauth.socialaccount.providers.facebook',
@@ -131,7 +133,7 @@ WSGI_APPLICATION = 'carniviews-django.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql',
-        'NAME': 'bethea28',  # Replace with your local database name
+        'NAME': 'carnival',  # Replace with your local database name
         'USER': 'bethea28',  # Replace with your local database user
         'PASSWORD': '',  # Replace with your local database user's password
         'HOST': 'localhost',  # Or '127.0.0.1'
@@ -188,3 +190,9 @@ STATIC_URL = 'static/'
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
+
+SIMPLE_JWT = {
+    'ACCESS_TOKEN_LIFETIME': timedelta(minutes=5),  # Access token expires in 5 minutes
+    'REFRESH_TOKEN_LIFETIME': timedelta(days=1),      # Refresh token expires in 1 day
+    # ... other settings
+}

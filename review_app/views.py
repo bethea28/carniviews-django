@@ -3,14 +3,13 @@ from django.views.decorators.csrf import csrf_exempt
 import json
 from .models import Review
 from company_app.models import Company
-from django.http import JsonResponse
-from django.db.models import Avg
-import math
-# from .models import Company, Review  # Assuming your models are in the same app
-
+from django.contrib.auth.decorators import login_required  # Import login_required
+from user_app.models import CustomUser
+from django.shortcuts import get_object_or_404 #import get_object_or_404
 
 @csrf_exempt
-def addReview(request, company_id):  # Add company_id as a parameter
+# @login_required  # Require user to be logged in
+def addReview(request, company_id, user_id):
     if request.method == "POST":
         try:
             data = json.loads(request.body)
@@ -22,14 +21,11 @@ def addReview(request, company_id):  # Add company_id as a parameter
 
             if rating is None:
                 return JsonResponse({"error": "Rating is required"}, status=400)
-            # if review_text == None |  rating == None:
-            #     return JsonResponse({"error": "Both can't be empty"}, status=400)
-            try:
-                company = Company.objects.get(id=company_id)  # Use company_id from URL
-            except Company.DoesNotExist:
-                return JsonResponse({"error": "Company not found"}, status=404)
 
-            review = Review(review=review_text, rating=rating, company=company)
+            company = get_object_or_404(Company, id=company_id)
+            user = get_object_or_404(CustomUser, id=user_id) #get user object.
+
+            review = Review(review=review_text, rating=rating, company=company, user=user) #add user.
             review.save()
             return JsonResponse({"message": "Review created!"})
 
@@ -40,7 +36,7 @@ def addReview(request, company_id):  # Add company_id as a parameter
     else:
         return JsonResponse({"error": "Invalid method"}, status=405)
     
-
+    
 @csrf_exempt
 def getReviews(request, company_id):
     if request.method == "GET":

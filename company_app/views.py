@@ -1,11 +1,21 @@
+# from django.http import JsonResponse
+# from django.views.decorators.csrf import csrf_exempt
+# import json
+# from .models import Company
+# from images_app.models import Image
+# from django.contrib.auth.decorators import login_required  # Import login_required
+
 from django.http import JsonResponse
 from django.views.decorators.csrf import csrf_exempt
 import json
 from .models import Company
 from images_app.models import Image
-
+# from django.contrib.auth.models import User  # Import User model
+from django.shortcuts import get_object_or_404 #import get_object_or_404
+# from user_app.models import Image
+from user_app.models import CustomUser
 @csrf_exempt
-def addCompany(request):
+def addCompany(request, user_id):  # Accept user_id from URL
     """
     Creates a Company object and associated Image objects from a JSON request body,
     with companyInfo stored in separate columns.
@@ -17,6 +27,10 @@ def addCompany(request):
             image_urls = request_data.get('imageUrls', [])
             hours_data = request_data.get('hoursData', {})
 
+            # Get the user object based on user_id
+            user = get_object_or_404(CustomUser, id=user_id) #get user object by user id.
+            all = CustomUser.objects.all()
+            print('all users bryan',all )
             # Create Company object, populating individual fields
             company = Company(
                 name=company_info.get('name', ''),
@@ -28,7 +42,8 @@ def addCompany(request):
                 company_type=company_info.get('type', ''),
                 photos=company_info.get('photos', []),
                 hoursData=hours_data,
-                description=company_info.get('description', '')  # Include description here
+                description=company_info.get('description', ''),
+                user=user  # Associate with the user from URL
             )
             company.save()
 
@@ -46,7 +61,7 @@ def addCompany(request):
             return JsonResponse({'error': str(e)}, status=500)
     else:
         return JsonResponse({'error': 'Method not allowed'}, status=405)
-
+        
 def getCompanies(request):
     """
     Retrieves all companies and their associated images, with companyInfo from separate columns.

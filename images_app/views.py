@@ -2,21 +2,23 @@ from django.http import JsonResponse
 from django.views.decorators.csrf import csrf_exempt
 import json
 from company_app.models import Company  # Correct import for Company
+from user_app.models import CustomUser  # Correct import for CustomUser
 from images_app.models import Image
 
 @csrf_exempt
-def addCompanyImages(request, company_id):
+def addCompanyImages(request, company_id, user_id):
     """API endpoint to add images to an existing company."""
 
     if request.method == 'POST':
         try:
             company = Company.objects.get(id=company_id) # Retrieve the company object.
+            user = CustomUser.objects.get(id=user_id) # Retrieve the company object.
 
             request_data = json.loads(request.body)
             image_urls = request_data.get('imageUrls', [])
 
             for image_url in image_urls:
-                Image.objects.create(company=company, image_url=image_url) # create images.
+                Image.objects.create(company=company, image_url=image_url, user=user) # create images.
 
             return JsonResponse({'message': 'Images added successfully'}, status=201)
 
