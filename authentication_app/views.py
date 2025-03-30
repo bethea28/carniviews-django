@@ -53,6 +53,7 @@ def create_jwt_for_user(user):
     }
 
 @csrf_exempt
+
 def googleAuth(request):
     if request.method == "POST":
         try:
@@ -60,33 +61,44 @@ def googleAuth(request):
             userData = data.get('userData')
             id_token_value = userData.get('data', {}).get('idToken')
 
-            print('CHRIS NOW',id_token_value)
+            print('CHRIS NOW', id_token_value)
 
             if not id_token_value:
                 return JsonResponse({'message': 'idToken missing'}, status=400)
 
             google_user_info = verify_google_token(id_token_value)
-            print('GETTING THESE NDAME',google_user_info)
+            print('GETTING THESE NDAME', google_user_info)
             if google_user_info:
                 try:
-                    user = CustomUser.objects.get(email=google_user_info['email']) #get user by email.
+                    user = CustomUser.objects.get(email=google_user_info['email'])  # Get user by email.
                 except CustomUser.DoesNotExist:
                     try:
-                        user = CustomUser.objects.create_user( #use create_user, and set username to email.
+                        user = CustomUser.objects.create_user(  # Use create_user, and set username to email.
                             email=google_user_info['email'],
                             username=google_user_info['email'],
                             google_id=google_user_info['user_id'],
                             name=google_user_info['name'],
                             photo=google_user_info['picture'],
-                            givenName = google_user_info['givenName'],
-                            familyName = google_user_info['familyName'],
+                            givenName=google_user_info['givenName'],
+                            familyName=google_user_info['familyName'],
                         )
-                    except IntegrityError: #handle duplicate email.
+                    except IntegrityError:  # Handle duplicate email.
                         return JsonResponse({'message': 'Email already exists'}, status=400)
 
                 jwt_tokens = create_jwt_for_user(user)
-                print('MY JWT IS HERE TOO,',jwt_tokens)
-                return JsonResponse({'message': 'Google sign-in successful', 'user': google_user_info, 'tokens': jwt_tokens}, status=200)
+                print('MY JWT IS HERE TOO,', jwt_tokens)
+
+                # Option 1: Include user_id inside the user object
+                response_data = {
+                    'message': 'Google sign-in successful',
+                    'user': {
+                        **google_user_info,  # Include existing Google user info
+                        'user_id': str(user.id),  # Add the user_id (convert to string)
+                    },
+                    'tokens': jwt_tokens,
+                }
+
+                return JsonResponse(response_data, status=200)
 
             else:
                 return JsonResponse({'message': 'Google sign-in failed'}, status=401)
