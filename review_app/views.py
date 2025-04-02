@@ -6,6 +6,7 @@ from company_app.models import Company
 from django.contrib.auth.decorators import login_required  # Import login_required
 from user_app.models import CustomUser
 from django.shortcuts import get_object_or_404 #import get_object_or_404
+from django.db.models import F #field look ups
 
 @csrf_exempt
 # @login_required  # Require user to be logged in
@@ -37,13 +38,20 @@ def addReview(request, company_id, user_id):
         return JsonResponse({"error": "Invalid method"}, status=405)
     
     
-@csrf_exempt
+# @csrf_exempt
+# from django.http import JsonResponse
+# from .models import Company, Review
+
 def getReviews(request, company_id):
     if request.method == "GET":
         try:
             company = Company.objects.get(id=company_id)
-            reviews = Review.objects.filter(company=company).values('review', 'rating')  # Fetch reviews and serialize them
-            reviews_list = list(reviews)  # Convert QuerySet to list for JSON serialization
+            reviews = Review.objects.filter(company=company).values(
+                'review',
+                'rating',
+                displayName=F('user__name')  # Access username from CustomUser
+            )
+            reviews_list = list(reviews)
             return JsonResponse({"reviews": reviews_list})
         except Company.DoesNotExist:
             return JsonResponse({"error": "Company not found"}, status=404)
@@ -51,7 +59,6 @@ def getReviews(request, company_id):
             return JsonResponse({"error": str(e)}, status=500)
     else:
         return JsonResponse({"error": "Invalid method"}, status=405)
-    
     
 @csrf_exempt
 def getRatings(request, company_id):
