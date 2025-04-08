@@ -14,8 +14,67 @@ from images_app.models import Image
 from django.shortcuts import get_object_or_404 #import get_object_or_404
 # from user_app.models import Image
 from user_app.models import CustomUser
+from django.db.models import F
+
+
+from django.http import JsonResponse
+from django.views.decorators.csrf import csrf_exempt
+import json
+from .models import UnverifiedCompany  # Import UnverifiedCompany
+from images_app.models import Image
+from django.shortcuts import get_object_or_404
+from user_app.models import CustomUser
+from django.db.models import F
+
 @csrf_exempt
-def addCompany(request, user_id):  # Accept user_id from URL
+def addUnverifiedCompany(request, user_id):
+    """
+    Creates an UnverifiedCompany object and associated Image objects from a JSON request body.
+    """
+    if request.method == 'POST':
+        try:
+            request_data = json.loads(request.body)
+            company_info = request_data.get('companyInfo', {})
+            image_urls = request_data.get('imageUrls', [])
+            hours_data = request_data.get('hoursData', {})
+
+            # Get the user object based on user_id
+            user = get_object_or_404(CustomUser, id=user_id)
+
+            # Create UnverifiedCompany object
+            unverified_company = UnverifiedCompany(
+                name=company_info.get('name', ''),
+                address=company_info.get('address', ''),
+                city=company_info.get('city', ''),
+                state=company_info.get('state', ''),
+                zip_code=company_info.get('zip', ''),
+                hours=company_info.get('hours', ''),
+                company_type=company_info.get('type', ''),
+                photos=company_info.get('photos', []),
+                hoursData=hours_data,
+                description=company_info.get('description', ''),
+                user=user  # Associate with the user from URL
+            )
+            unverified_company.save()
+
+            # Create Image objects and associate them with the UnverifiedCompany
+            for image_url in image_urls:
+                Image.objects.create(unverified_company=unverified_company, image_url=image_url)
+
+            return JsonResponse({'message': 'Unverified company and images submitted successfully'}, status=201)
+
+        except json.JSONDecodeError:
+            return JsonResponse({'error': 'Invalid JSON in request body'}, status=400)
+        except KeyError as e:
+            return JsonResponse({'error': f'Missing key in request body: {e}'}, status=400)
+        except Exception as e:
+            return JsonResponse({'error': str(e)}, status=500)
+    else:
+        return JsonResponse({'error': 'Method not allowed'}, status=405)
+    
+
+@csrf_exempt
+def addVerifiedCompany(request, user_id):  # Accept user_id from URL
     """
     Creates a Company object and associated Image objects from a JSON request body,
     with companyInfo stored in separate columns.
@@ -61,14 +120,18 @@ def addCompany(request, user_id):  # Accept user_id from URL
             return JsonResponse({'error': str(e)}, status=500)
     else:
         return JsonResponse({'error': 'Method not allowed'}, status=405)
-  
+
+
+
+
 def getCompanies(request):
     """
-    Retrieves companies with optional skip and limit parameters for pagination.
+    Retrieves companies with optional skip and limit parameters, sorted by name.
     """
     if request.method == 'GET':
         try:
-            companies = Company.objects.all()
+            companies = Company.objects.all().order_by('name')  # Sort by name
+
             skip_str = request.GET.get('skip')
             limit_str = request.GET.get('limit')
 
