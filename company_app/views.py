@@ -61,16 +61,28 @@ def addCompany(request, user_id):  # Accept user_id from URL
             return JsonResponse({'error': str(e)}, status=500)
     else:
         return JsonResponse({'error': 'Method not allowed'}, status=405)
-        
+  
 def getCompanies(request):
     """
-    Retrieves all companies and their associated images, with companyInfo from separate columns.
+    Retrieves companies with optional skip and limit parameters for pagination.
     """
     if request.method == 'GET':
         try:
             companies = Company.objects.all()
-            company_list = []
+            skip_str = request.GET.get('skip')
+            limit_str = request.GET.get('limit')
 
+            start = 0
+            if skip_str is not None and skip_str.isdigit():
+                start = int(skip_str)
+                companies = companies[start:]
+
+            end = None
+            if limit_str is not None and limit_str.isdigit():
+                end = int(limit_str)
+                companies = companies[:end]
+
+            company_list = []
             for company in companies:
                 company_data = {
                     'id': company.id,
@@ -83,7 +95,7 @@ def getCompanies(request):
                         'hours': company.hours,
                         'type': company.company_type,
                         'photos': company.photos,
-                        'description': company.description,  # Include description here
+                        'description': company.description,
                     },
                     'hoursData': company.hoursData,
                     'images': [{'id': image.id, 'image_url': image.image_url} for image in company.images.all()]
