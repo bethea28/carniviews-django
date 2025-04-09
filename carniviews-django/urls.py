@@ -17,6 +17,7 @@ urlpatterns = [
     path('authentication/', include('authentication_app.urls')),
     path('reviews/', include('review_app.urls')),
     path('ratings/', include('rating_app.urls')),
+    path('feedback/', include('feedback_app.urls')),
     path('company/', include('company_app.urls')),  # Group under /companies/
     path('bryan/', include('book_app.urls')),
     path('admin/', admin.site.urls),

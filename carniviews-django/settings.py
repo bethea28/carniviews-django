@@ -41,6 +41,7 @@ INSTALLED_APPS = [
     'book_app',
     'authentication_app',
     'review_app',
+    'feedback_app',
     'company_app',
     'images_app',
     'user_app',
