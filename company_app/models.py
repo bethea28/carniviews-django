@@ -28,14 +28,15 @@ class Company(models.Model):
     from django.db import models
 
 class UnverifiedCompany(models.Model):
-    name = models.CharField(max_length=255)
-    address = models.CharField(max_length=255)
+    name = models.CharField(max_length=1255)
+    address = models.CharField(max_length=1255)
     city = models.CharField(max_length=100)
     state = models.CharField(max_length=50)
     zip_code = models.CharField(max_length=20)
     hours = models.CharField(max_length=255)
     company_type = models.CharField(max_length=100)
-    photos = models.JSONField(default=list)
+    # photos = models.JSONField(null=True, blank=True)
+    photos = models.JSONField(default=dict)  # Correct way for mutable defaults
     hoursData = models.JSONField(default=dict)
     description = models.TextField(blank=True, null=True)
     user = models.ForeignKey(CustomUser, on_delete=models.CASCADE, related_name='unverified_companies') #add user foreign key

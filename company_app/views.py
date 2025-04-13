@@ -50,7 +50,7 @@ def addUnverifiedCompany(request, user_id):
                 zip_code=company_info.get('zip', ''),
                 hours=company_info.get('hours', ''),
                 company_type=company_info.get('type', ''),
-                photos=company_info.get('photos', []),
+                photos=image_urls,
                 hoursData=hours_data,
                 description=company_info.get('description', ''),
                 user=user  # Associate with the user from URL
@@ -58,9 +58,13 @@ def addUnverifiedCompany(request, user_id):
             unverified_company.save()
 
             # Create Image objects and associate them with the UnverifiedCompany
+            # Create Image objects and associate them with the UnverifiedCompany
             for image_url in image_urls:
-                Image.objects.create(unverified_company=unverified_company, image_url=image_url)
-
+                Image.objects.create(
+                    unverified_company=unverified_company,
+                    user=user,  # Assign the user here
+                    image_url=image_url
+                )
             return JsonResponse({'message': 'Unverified company and images submitted successfully'}, status=201)
 
         except json.JSONDecodeError:
