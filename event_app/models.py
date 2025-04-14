@@ -6,6 +6,7 @@ class Event(models.Model):
     user = models.ForeignKey(CustomUser, on_delete=models.CASCADE, related_name='events')  # Use CustomUser directly
     name = models.CharField(max_length=255)
     address = models.CharField(max_length=255)
+    price = models.CharField(max_length=100)
     city = models.CharField(max_length=100)
     state = models.CharField(max_length=50)
     zip_code = models.CharField(max_length=20)

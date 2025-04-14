@@ -111,7 +111,7 @@ def addEvent(request, user_id):
 
             # Get the user object based on user_id from the URL
             user = get_object_or_404(CustomUser, id=user_id)
-
+            print('event info now', event_info)
             # Parse time strings into datetime.time objects
             def parse_time(time_str):
                 if not time_str:
@@ -138,6 +138,7 @@ def addEvent(request, user_id):
                 city=event_info.get('city', ''),
                 state=event_info.get('state', ''),
                 zip_code=event_info.get('zip', ''),
+                price=event_info.get('price', ''),
                 hours=event_hours,  # Store the event_hours dictionary
                 start_time=start_time_obj,  # Store as TimeField
                 end_time=end_time_obj,  # Store as TimeField
@@ -227,6 +228,7 @@ def getAllEvents(request):
                     'state': event.state,
                     'zip_code': event.zip_code,
                     'hours': event.hours,
+                    'price': event.price,
                     'start_time': str(
                         event.start_time),  # Convert TimeField to string
                     'end_time': str(
