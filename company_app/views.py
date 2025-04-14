@@ -93,7 +93,7 @@ def addVerifiedCompany(request, user_id):  # Accept user_id from URL
             # Get the user object based on user_id
             user = get_object_or_404(CustomUser, id=user_id) #get user object by user id.
             all = CustomUser.objects.all()
-            print('all users bryan',all )
+            print('all users bryan',request_data )
             # Create Company object, populating individual fields
             company = Company(
                 name=company_info.get('name', ''),
