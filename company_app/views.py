@@ -135,7 +135,7 @@ def getCompanies(request):
     if request.method == 'GET':
         try:
             companies = Company.objects.all().order_by('name')  # Sort by name
-
+            print('get all companies', companies)
             skip_str = request.GET.get('skip')
             limit_str = request.GET.get('limit')
 
@@ -165,8 +165,8 @@ def getCompanies(request):
                         'description': company.description,
                     },
                     'hoursData': company.hoursData,
-                    'images': [{'id': image.id, 'image_url': image.image_url} for image in company.images.all()]
-                }
+                    # 'images': [{'id': image.id, 'image_url': image.image_url} for image in company.images.all()]  
+                      }
                 company_list.append(company_data)
 
             return JsonResponse(company_list, safe=False)
