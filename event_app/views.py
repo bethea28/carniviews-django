@@ -127,10 +127,12 @@ def addEvent(request, user_id):
                             f"Invalid time format: {time_str}.  Use HH:MM:SS or H:MM AM/PM"
                         )
 
-            start_time_obj = parse_time(event_hours.get('start'))
-            end_time_obj = parse_time(event_hours.get('end'))
-
+            start_time_obj = event_hours.get('start')
+            end_time_obj = event_hours.get('end')
+            print('test hour n start adding' , event_hours.get('start'))
+            # print('test hour n start ow  the full obj', start_time_obj)
             # Create Event object
+            # return
             event = Event(
                 user=user,
                 name=event_info.get('name', ''),
@@ -179,73 +181,64 @@ def addEvent(request, user_id):
         return JsonResponse({'error': 'Method not allowed'}, status=405)
 
 
-@csrf_exempt  # Added csrf_exempt decorator
+@csrf_exempt
 def getAllEvents(request):
     """
-    Retrieves all events from the database and returns them as a JSON response.
-    Includes associated images and user information.
+    Retrieves all events and returns them as JSON.
+    Matches the structure used in addEvent view (with extended address fields).
     """
     logger.debug('Entering getAllEvents view')
+
     if request.method == 'GET':
         try:
-            events = Event.objects.all()  # Get all Event objects
+            events = Event.objects.all()
 
-            # Prepare the data structure
             events_data = []
             for event in events:
-                # Get the images for the current event
+                # Get all associated images
                 images = EventImage.objects.filter(event=event)
                 image_uris = []
                 for image in images:
-                    #  Check if image.image is a dictionary and contains 'uri'
-                    print('KENYA MARTING Da,insideWN',type(image.image))
                     if isinstance(image.image, dict) and 'uri' in image.image:
-                        image_uris.append(
-                            {'uri': image.image.get('uri')}
-                        )  # Extract the URI from the dictionary
+                        image_uris.append({'uri': image.image['uri']})
                     else:
-                        logger.warning(
-                            f"Image data for EventImage {image.id} is not a dictionary with 'uri' key. Skipping."
-                        )
-                        image_uris.append(
-                            {'uri': None}
-                        )  # Append None URI to maintain consistency
+                        logger.warning(f"Invalid image data for EventImage {image.id}")
+                        image_uris.append({'uri': None})
 
-                # Get the user for the current event
+                # Get user info
                 user = event.user
                 user_data = {
                     'id': user.id,
                     'username': user.username,
                     'first_name': user.first_name,
                     'last_name': user.last_name,
-                    # Add other user fields as needed
                 }
-                print('ALL FOOTBALL TEAM',image_uris)
+
                 event_data = {
                     'id': event.id,
                     'name': event.name,
-                    'address': event.address,
+                    'addressLine1': event.address_line1,
+                    'addressLine2': event.address_line2,
                     'city': event.city,
-                    'state': event.state,
-                    'zip_code': event.zip_code,
-                    'hours': event.hours,
+                    'region': event.region,
+                    'postal': event.postal_code,
+                    'country': event.country,
                     'price': event.price,
-                    'start_time': str(
-                        event.start_time),  # Convert TimeField to string
-                    'end_time': str(
-                        event.end_time),  # Convert TimeField to string
+                    'start_time': str(event.start_time),
+                    'end_time': str(event.end_time),
                     'type': event.type,
                     'description': event.description,
-                    'images': image_uris,  # Include the list of image URIs
-                    'user': user_data,  # Include user data
+                    'images': image_uris,
+                    'user': user_data,
                 }
+
                 events_data.append(event_data)
 
-            return JsonResponse({'events': events_data}, safe=False, status=200)
+            return JsonResponse({'events': events_data}, status=200, safe=False)
 
         except Exception as e:
             logger.error(f'Error in getAllEvents: {e}', exc_info=True)
             return JsonResponse({'error': str(e)}, status=500)
-    else:
-        logger.warning('Invalid method for getAllEvents')
-        return JsonResponse({'error': 'Method not allowed'}, status=405)
+
+    logger.warning('Invalid method for getAllEvents')
+    return JsonResponse({'error': 'Method not allowed'}, status=405)
