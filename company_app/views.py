@@ -40,14 +40,34 @@ def addUnverifiedCompany(request, user_id):
 
             # Get the user object based on user_id
             user = get_object_or_404(CustomUser, id=user_id)
+            print('HERE IS MY UNVERIFIED COMP', request_data)
 
+        
+            # # Create UnverifiedCompany object
+            # unverified_company = UnverifiedCompany(
+            #     name=company_info.get('name', ''),
+            #     address=company_info.get('address', ''),
+            #     city=company_info.get('city', ''),
+            #     state=company_info.get('state', ''),
+            #     zip_code=company_info.get('zip', ''),
+            #     hours=company_info.get('hours', ''),
+            #     company_type=company_info.get('type', ''),
+            #     photos=image_urls,
+            #     hoursData=hours_data,
+            #     description=company_info.get('description', ''),
+            #     user=user  # Associate with the user from URL
+            # )
+
+             
             # Create UnverifiedCompany object
             unverified_company = UnverifiedCompany(
                 name=company_info.get('name', ''),
-                address=company_info.get('address', ''),
+                address_line1=company_info.get('addressLine1', ''),
+                address_line2=company_info.get('addressLine2', ''),
                 city=company_info.get('city', ''),
-                state=company_info.get('state', ''),
-                zip_code=company_info.get('zip', ''),
+                region=company_info.get('region', ''),
+                postal_code=company_info.get('postal', ''),
+                country=company_info.get('country', ''),
                 hours=company_info.get('hours', ''),
                 company_type=company_info.get('type', ''),
                 photos=image_urls,
@@ -55,8 +75,8 @@ def addUnverifiedCompany(request, user_id):
                 description=company_info.get('description', ''),
                 user=user  # Associate with the user from URL
             )
-            unverified_company.save()
 
+            unverified_company.save()
             # Create Image objects and associate them with the UnverifiedCompany
             # Create Image objects and associate them with the UnverifiedCompany
             for image_url in image_urls:
@@ -148,19 +168,39 @@ def getCompanies(request):
             if limit_str is not None and limit_str.isdigit():
                 end = int(limit_str)
                 companies = companies[:end]
-
+            print('getting all companies now', companies)
+            # return
             company_list = []
+
+
+            # unverified_company = UnverifiedCompany(
+            #     name=company_info.get('name', ''),
+            #     address_line1=company_info.get('addressLine1', ''),
+            #     address_line2=company_info.get('addressLine2', ''),
+            #     city=company_info.get('city', ''),
+            #     region=company_info.get('region', ''),
+            #     postal_code=company_info.get('postal', ''),
+            #     country=company_info.get('country', ''),
+            #     hours=company_info.get('hours', ''),
+            #     company_type=company_info.get('type', ''),
+            #     photos=image_urls,
+            #     hoursData=hours_data,
+            #     description=company_info.get('description', ''),
+            #     user=user  # Associate with the user from URL
+            # )
             for company in companies:
                 company_data = {
                     'id': company.id,
                     'companyInfo': {
                         'name': company.name,
-                        'address': company.address,
+                        'address_line1': company.address_line1,
+                        'address_line2': company.address_line2,
                         'city': company.city,
-                        'state': company.state,
-                        'zip': company.zip_code,
+                        "region":company.region,
+                        'postal_code': company.postal_code,
+                        'country': company.country,
                         'hours': company.hours,
-                        'type': company.company_type,
+                        'company_type': company.company_type,
                         'photos': company.photos,
                         'description': company.description,
                     },
