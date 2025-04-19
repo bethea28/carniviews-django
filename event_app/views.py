@@ -10,6 +10,91 @@ from datetime import datetime
 logger = logging.getLogger(__name__)
 
 
+# @csrf_exempt
+# def addEvent(request, user_id):
+#     """
+#     Creates an Event object and associated Image objects from a JSON request body.
+#     """
+#     logger.debug('this is my add event request.body: %s', request.body)
+#     if request.method == 'POST':
+#         try:
+#             request_data = json.loads(request.body)
+#             event_info = request_data.get('eventInfo', {})
+#             image_data_list = request_data.get('allImages', [])  # Changed variable name
+#             event_hours = request_data.get('eventHours', {})
+#             logger.debug('this is my add event request_data: %s', request_data)
+
+#             # Get the user object based on user_id from the URL
+#             user = get_object_or_404(CustomUser, id=user_id)
+
+#             # Parse time strings into datetime.time objects
+#             def parse_time(time_str):
+#                 if not time_str:
+#                     return None
+#                 try:
+#                     return datetime.strptime(time_str, "%I:%M %p").time()
+#                 except ValueError:
+#                     try:
+#                         return datetime.strptime(time_str, "%H:%M:%S").time()
+#                     except ValueError:
+#                         logger.error(f"Invalid time format: {time_str}")
+#                         raise ValueError(
+#                             f"Invalid time format: {time_str}.  Use HH:MM:SS or H:MM AM/PM"
+#                         )
+
+#             start_time_obj = parse_time(event_hours.get('start'))
+#             end_time_obj = parse_time(event_hours.get('end'))
+
+#             # Create Event object
+#             event = Event(
+#                 user=user,
+#                 name=event_info.get('name', ''),
+#                 address=event_info.get('address', ''),
+#                 city=event_info.get('city', ''),
+#                 state=event_info.get('state', ''),
+#                 zip_code=event_info.get('zip', ''),
+#                 hours=event_hours,  # Store the event_hours dictionary
+#                 start_time=start_time_obj,  # Store as TimeField
+#                 end_time=end_time_obj,  # Store as TimeField
+#                 type=event_info.get('type', ''),
+#                 description=event_info.get('description', ''),
+#             )
+#             event.save()
+
+#             # Create EventImage objects and associate them with the Event
+#             for image_data in image_data_list:  # Iterate through the list of image data
+#                 image_uri = image_data.get('uri')  # Extract the URI
+#                 if image_uri:  # Only create EventImage if URI is present
+#                     event_image = EventImage(
+#                         event=event,
+#                         image={'uri': image_uri},  # Store the URI in the JSONField
+#                     )
+#                     event_image.save()
+#                 else:
+#                     logger.warning(
+#                         f"Image URI is missing for an image in event {event.id}")  # Log warning
+
+#             return JsonResponse({'message': 'Event and images created successfully'},
+#                                 status=201)
+#         except json.JSONDecodeError as e:
+#             logger.error('JSONDecodeError: %s', e)
+#             return JsonResponse({'error': 'Invalid JSON in request body'}, status=400)
+#         except ValueError as e:
+#             return JsonResponse({'error': str(e)}, status=400)
+#         except KeyError as e:
+#             logger.error('KeyError: %s', e)
+#             return JsonResponse({'error': f'Missing key in request body: {e}'},
+#                                 status=400)
+#         except Exception as e:
+#             logger.error('Exception: %s', e, exc_info=True)
+#             return JsonResponse({'error': str(e)}, status=500)
+#     else:
+#         return JsonResponse({'error': 'Method not allowed'}, status=405)
+
+
+
+
+
 @csrf_exempt
 def addEvent(request, user_id):
     """
@@ -26,7 +111,7 @@ def addEvent(request, user_id):
 
             # Get the user object based on user_id from the URL
             user = get_object_or_404(CustomUser, id=user_id)
-
+            print('event info now requestData', request_data)
             # Parse time strings into datetime.time objects
             def parse_time(time_str):
                 if not time_str:
@@ -49,97 +134,13 @@ def addEvent(request, user_id):
             event = Event(
                 user=user,
                 name=event_info.get('name', ''),
-                address=event_info.get('address', ''),
+                address_line1=event_info.get('addressLine1', ''),
+                address_line2=event_info.get('addressLine2', ''),
                 city=event_info.get('city', ''),
-                state=event_info.get('state', ''),
-                zip_code=event_info.get('zip', ''),
-                hours=event_hours,  # Store the event_hours dictionary
-                start_time=start_time_obj,  # Store as TimeField
-                end_time=end_time_obj,  # Store as TimeField
-                type=event_info.get('type', ''),
-                description=event_info.get('description', ''),
-            )
-            event.save()
-
-            # Create EventImage objects and associate them with the Event
-            for image_data in image_data_list:  # Iterate through the list of image data
-                image_uri = image_data.get('uri')  # Extract the URI
-                if image_uri:  # Only create EventImage if URI is present
-                    event_image = EventImage(
-                        event=event,
-                        image={'uri': image_uri},  # Store the URI in the JSONField
-                    )
-                    event_image.save()
-                else:
-                    logger.warning(
-                        f"Image URI is missing for an image in event {event.id}")  # Log warning
-
-            return JsonResponse({'message': 'Event and images created successfully'},
-                                status=201)
-        except json.JSONDecodeError as e:
-            logger.error('JSONDecodeError: %s', e)
-            return JsonResponse({'error': 'Invalid JSON in request body'}, status=400)
-        except ValueError as e:
-            return JsonResponse({'error': str(e)}, status=400)
-        except KeyError as e:
-            logger.error('KeyError: %s', e)
-            return JsonResponse({'error': f'Missing key in request body: {e}'},
-                                status=400)
-        except Exception as e:
-            logger.error('Exception: %s', e, exc_info=True)
-            return JsonResponse({'error': str(e)}, status=500)
-    else:
-        return JsonResponse({'error': 'Method not allowed'}, status=405)
-
-
-
-
-
-@csrf_exempt
-def addEvent(request, user_id):
-    """
-    Creates an Event object and associated Image objects from a JSON request body.
-    """
-    logger.debug('this is my add event request.body: %s', request.body)
-    if request.method == 'POST':
-        try:
-            request_data = json.loads(request.body)
-            event_info = request_data.get('eventInfo', {})
-            image_data_list = request_data.get('allImages', [])  # Changed variable name
-            event_hours = request_data.get('eventHours', {})
-            logger.debug('this is my add event request_data: %s', request_data)
-
-            # Get the user object based on user_id from the URL
-            user = get_object_or_404(CustomUser, id=user_id)
-            print('event info now', event_info)
-            # Parse time strings into datetime.time objects
-            def parse_time(time_str):
-                if not time_str:
-                    return None
-                try:
-                    return datetime.strptime(time_str, "%I:%M %p").time()
-                except ValueError:
-                    try:
-                        return datetime.strptime(time_str, "%H:%M:%S").time()
-                    except ValueError:
-                        logger.error(f"Invalid time format: {time_str}")
-                        raise ValueError(
-                            f"Invalid time format: {time_str}.  Use HH:MM:SS or H:MM AM/PM"
-                        )
-
-            start_time_obj = parse_time(event_hours.get('start'))
-            end_time_obj = parse_time(event_hours.get('end'))
-
-            # Create Event object
-            event = Event(
-                user=user,
-                name=event_info.get('name', ''),
-                address=event_info.get('address', ''),
-                city=event_info.get('city', ''),
-                state=event_info.get('state', ''),
-                zip_code=event_info.get('zip', ''),
+                region=event_info.get('region', ''),
+                postal_code=event_info.get('postal', ''),
+                country=event_info.get('country', ''),
                 price=event_info.get('price', ''),
-                hours=event_hours,  # Store the event_hours dictionary
                 start_time=start_time_obj,  # Store as TimeField
                 end_time=end_time_obj,  # Store as TimeField
                 type=event_info.get('type', ''),
