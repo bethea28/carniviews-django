@@ -51,7 +51,6 @@ class Company(models.Model):
         return self.images.all()
     
 
-    from django.db import models
 
 # class UnverifiedCompany(models.Model):
 #     name = models.CharField(max_length=1255)
