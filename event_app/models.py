@@ -44,6 +44,7 @@ class Event(models.Model):
     start_time = models.CharField(max_length=50)
     end_time = models.CharField(max_length=50)
     type = models.CharField(max_length=255)
+    ticket = models.URLField(max_length=255)  # Use URLField
     description = models.TextField(blank=True, null=True)
     # allImages = models.ManyToManyField('EventImage', blank=True) # Removed EventImage model and using ImageField directly
     

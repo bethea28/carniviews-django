@@ -143,6 +143,7 @@ def addEvent(request, user_id):
                 postal_code=event_info.get('postal', ''),
                 country=event_info.get('country', ''),
                 price=event_info.get('price', ''),
+                ticket=event_info.get('ticket', ''),
                 start_time=start_time_obj,  # Store as TimeField
                 end_time=end_time_obj,  # Store as TimeField
                 type=event_info.get('type', ''),
@@ -224,6 +225,7 @@ def getAllEvents(request):
                     'postal': event.postal_code,
                     'country': event.country,
                     'price': event.price,
+                    'ticket': event.ticket,
                     'start_time': str(event.start_time),
                     'end_time': str(event.end_time),
                     'type': event.type,
