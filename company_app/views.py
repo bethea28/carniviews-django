@@ -8,19 +8,19 @@
 from django.http import JsonResponse
 from django.views.decorators.csrf import csrf_exempt
 import json
-from .models import Company
+# from models import Company
 from images_app.models import Image
 # from django.contrib.auth.models import User  # Import User model
 from django.shortcuts import get_object_or_404 #import get_object_or_404
 # from user_app.models import Image
 from user_app.models import CustomUser
 from django.db.models import F
-
+# from models import Recommendation
 
 from django.http import JsonResponse
 from django.views.decorators.csrf import csrf_exempt
 import json
-from .models import UnverifiedCompany  # Import UnverifiedCompany
+from .models import UnverifiedCompany, Company, Recommendation
 from images_app.models import Image
 from django.shortcuts import get_object_or_404
 from user_app.models import CustomUser
@@ -67,6 +67,8 @@ def addUnverifiedCompany(request, user_id):
                 city=company_info.get('city', ''),
                 region=company_info.get('region', ''),
                 postal_code=company_info.get('postal', ''),
+                contact=company_info.get('contact', ''),
+                website=company_info.get('website', ''),
                 country=company_info.get('country', ''),
                 hours=company_info.get('hours', ''),
                 company_type=company_info.get('type', ''),
@@ -122,6 +124,8 @@ def addVerifiedCompany(request, user_id):  # Accept user_id from URL
                 state=company_info.get('state', ''),
                 zip_code=company_info.get('zip', ''),
                 hours=company_info.get('hours', ''),
+                contact=company_info.get('contact', ''),
+                website=company_info.get('website', ''),
                 company_type=company_info.get('type', ''),
                 photos=company_info.get('photos', []),
                 hoursData=hours_data,
@@ -198,8 +202,10 @@ def getCompanies(request):
                         'city': company.city,
                         "region":company.region,
                         'postal_code': company.postal_code,
+                        'contact': company.contact,
                         'country': company.country,
                         'hours': company.hours,
+                        "website": company.website,
                         'company_type': company.company_type,
                         'photos': company.photos,
                         'description': company.description,
@@ -215,3 +221,46 @@ def getCompanies(request):
             return JsonResponse({'error': str(e)}, status=500)
     else:
         return JsonResponse({'error': 'Method not allowed'}, status=405)
+    
+
+
+
+@csrf_exempt
+def addRec(request, user_id, company_id):
+    if request.method == 'POST':
+        request_data = json.loads(request.body)
+        companyId = request_data.get('companyId','')
+        userId = request_data.get('userId','')
+        rec = request_data.get('rec','')
+
+        user = get_object_or_404(CustomUser, id=userId) #get user object by user id.
+        company = get_object_or_404(Company, id=companyId) #get user object by user id.
+
+        rec = Recommendation(
+          rec=rec,
+          user=user,  
+          company=company
+        )
+        rec.save()
+        return JsonResponse({'message': 'Recommondation successfully'}, status=201)
+    return JsonResponse({'message': 'Recommondation Failed'}, status=500)
+
+    None
+
+
+@csrf_exempt
+def getCompanyRecs(request, company_id):
+    if request.method == 'GET':
+
+        company = Company.objects.get(id=company_id)
+        recs = Recommendation.objects.filter(company=company).values(
+            'rec',
+            'user_id'
+        )
+
+        allRecs=list(recs)
+        print('show me dictorary list', allRecs)
+        return JsonResponse({'message': 'Recommondation successfully retrieved', "allRecs": allRecs}, status=201)
+    return JsonResponse({'message': 'Recommondation Failed'}, status=500)
+
+    None

@@ -2,7 +2,7 @@ from django.db import models
 import json
 from django.conf import settings # Import settings for user model
 from user_app.models import CustomUser  # Import the Company model
-
+# from company_app.models import Company
 
 # class Company(models.Model):
 #     name = models.CharField(max_length=255)
@@ -38,6 +38,8 @@ class Company(models.Model):
     hours = models.CharField(max_length=255, blank=True, null=True)
     company_type = models.CharField(max_length=100)
     photos = models.JSONField(default=dict)
+    contact = models.CharField(max_length=255, blank=True, null=True)
+    website = models.URLField(max_length=255)  # Use URLField
     hoursData = models.JSONField(default=dict)
     description = models.TextField(blank=True, null=True)
     user = models.ForeignKey(CustomUser, on_delete=models.CASCADE, related_name='companies')
@@ -91,8 +93,10 @@ class UnverifiedCompany(models.Model):
     )
     country = models.CharField(max_length=100)  # Added field to store the company's country
     hours = models.CharField(max_length=255, blank=True, null=True)
+    contact = models.CharField(max_length=255, blank=True, null=True)
     company_type = models.CharField(max_length=100)
     photos = models.JSONField(default=dict)
+    website = models.URLField(max_length=255)  # Use URLField
     hoursData = models.JSONField(default=dict)
     description = models.TextField(blank=True, null=True)
     user = models.ForeignKey(CustomUser, on_delete=models.CASCADE, related_name='unverified_companies')
@@ -100,3 +104,11 @@ class UnverifiedCompany(models.Model):
 
     def __str__(self):
         return f"Unverified: {self.name} (Submitted by {self.user})"
+    
+
+
+
+class Recommendation(models.Model):
+    rec = models.CharField(max_length=255)
+    user = models.ForeignKey(CustomUser, on_delete=models.CASCADE, related_name='users') #add user foreign key
+    company = models.ForeignKey(Company, on_delete=models.CASCADE, related_name='companies') #add user foreign key
