@@ -254,10 +254,9 @@ def addRec(request):
 
 
 @csrf_exempt
-def getCompanyRecs(request):
+def getCompanyRecs(request, company_id):
     if request.method == 'GET':
-        request_data = json.loads(request.body)
-        companyId = request_data.get("companyId",'')
+        companyId = company_id
         company = Company.objects.get(id=companyId)
         recs = Recommendation.objects.filter(company=company).values(
             'rec',
@@ -265,7 +264,7 @@ def getCompanyRecs(request):
         )
 
         allRecs=list(recs)
-        print('show me dictorary list', allRecs)
+        print('show me dictorary list DAREN', allRecs)
         return JsonResponse({'message': 'Recommondation successfully retrieved', "allRecs": allRecs}, status=201)
     return JsonResponse({'message': 'Recommondation Failed'}, status=500)
 
