@@ -226,33 +226,39 @@ def getCompanies(request):
 
 
 @csrf_exempt
-def addRec(request, user_id, company_id):
+def addRec(request):
     if request.method == 'POST':
         request_data = json.loads(request.body)
-        companyId = request_data.get('companyId','')
-        userId = request_data.get('userId','')
+        companyId = request_data.get('company_id','')
+        userId = request_data.get('user_id','')
         rec = request_data.get('rec','')
+        
+        user = get_object_or_404(CustomUser, id=userId)
+        company = get_object_or_404(Company, id=companyId)
 
-        user = get_object_or_404(CustomUser, id=userId) #get user object by user id.
-        company = get_object_or_404(Company, id=companyId) #get user object by user id.
+        # Check if a recommendation already exists for this user and company
+        existing_recommendation = Recommendation.objects.filter(user=user, company=company).first()
 
-        rec = Recommendation(
-          rec=rec,
-          user=user,  
-          company=company
-        )
-        rec.save()
-        return JsonResponse({'message': 'Recommondation successfully'}, status=201)
-    return JsonResponse({'message': 'Recommondation Failed'}, status=500)
+        if existing_recommendation:
+            # Update the existing recommendation
+            existing_recommendation.rec = rec
+            existing_recommendation.save()
+            return JsonResponse({'message': 'Recommendation successfully updated.'}, status=200)  # Use 200 for update
+        else:
+            # Create a new recommendation
+            recommendation = Recommendation(rec=rec, user=user, company=company)
+            recommendation.save()
+            return JsonResponse({'message': 'Recommendation successfully created.'}, status=201) # 201 for create
+    return JsonResponse({'message': 'Recommendation Failed'}, status=500)
 
-    None
 
 
 @csrf_exempt
-def getCompanyRecs(request, company_id):
+def getCompanyRecs(request):
     if request.method == 'GET':
-
-        company = Company.objects.get(id=company_id)
+        request_data = json.loads(request.body)
+        companyId = request_data.get("companyId",'')
+        company = Company.objects.get(id=companyId)
         recs = Recommendation.objects.filter(company=company).values(
             'rec',
             'user_id'
