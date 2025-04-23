@@ -65,6 +65,7 @@ def getReviews(request, company_id):
                 'value',
                 'amenities',
                 'vibes',
+                'costume',
                 'pickup',
                 'rating',
                 'review_date',
