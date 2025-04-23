@@ -135,7 +135,7 @@ WSGI_APPLICATION = 'carniviews-django.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql',
-        'NAME': 'carnivalTwo',  # Replace with your local database name
+        'NAME': 'carnival3',  # Replace with your local database name
         'USER': 'bethea28',  # Replace with your local database user
         'PASSWORD': '',  # Replace with your local database user's password
         'HOST': 'localhost',  # Or '127.0.0.1'

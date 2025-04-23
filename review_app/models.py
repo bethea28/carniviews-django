@@ -2,22 +2,23 @@ from django.db import models
 from company_app.models import Company  # Import the Company model
 from django.conf import settings # Import settings for user model
 from user_app.models import CustomUser
+from django.contrib.postgres.fields import JSONField  # For PostgreSQL
+from django.db.models import JSONField  # For other databases (less feature-rich)
 
 class Review(models.Model):
     company = models.ForeignKey(Company, on_delete=models.CASCADE, related_name='reviews')
     user = models.ForeignKey(CustomUser, on_delete=models.CASCADE, related_name='reviews') # Added user foreign key
     review = models.TextField()
-    submitted_by = models.TextField()
-    music = models.FloatField(default=0.0)
-    service = models.FloatField(default=0.0)
-    vibes = models.FloatField(default=0.0)
-    costume = models.FloatField(default=0.0)
-    price = models.FloatField(default=0.0)
-    food = models.FloatField(default=0.0)
-    value = models.FloatField(default=0.0)
-    amenities = models.FloatField(default=0.0)
-    pickup = models.FloatField(default=0.0)
-    rating = models.FloatField(default=0.0)
+    music = models.FloatField(default=0.0, null=True)
+    service = models.FloatField(default=0.0, null=True)
+    vibes = models.FloatField(default=0.0, null=True)
+    costume = models.FloatField(default=0.0, null=True)
+    price = models.FloatField(default=0.0, null=True)
+    food = models.FloatField(default=0.0, null=True)
+    value = models.FloatField(default=0.0, null=True)
+    amenities = models.FloatField(default=0.0, null=True)
+    pickup = models.FloatField(default=0.0, null=True)
+    rating = JSONField(default=list, blank=True, null=True)
     review_date = models.DateTimeField(auto_now_add=True)
 
 
