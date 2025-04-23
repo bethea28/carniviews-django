@@ -8,6 +8,9 @@ class Review(models.Model):
     user = models.ForeignKey(CustomUser, on_delete=models.CASCADE, related_name='reviews') # Added user foreign key
     review = models.TextField()
     rating = models.FloatField(default=0.0)
+    submitted_by = models.TextField()
+    review_date = models.DateTimeField(auto_now_add=True)
+
 
     def __str__(self):
         return f"Review: '{self.review[:50]}...', Rating: {self.rating}, Company: {self.company.name}, User: {self.user.username}"

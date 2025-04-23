@@ -16,7 +16,8 @@ def addReview(request, company_id, user_id):
             data = json.loads(request.body)
             review_text = data.get('review')
             rating = data.get('rating')
-
+            submittedBy = data.get('submittedBy')
+            print('this si add review',data)
             if not review_text:
                 return JsonResponse({"error": "Review text is required"}, status=400)
 
@@ -26,7 +27,7 @@ def addReview(request, company_id, user_id):
             company = get_object_or_404(Company, id=company_id)
             user = get_object_or_404(CustomUser, id=user_id) #get user object.
 
-            review = Review(review=review_text, rating=rating, company=company, user=user) #add user.
+            review = Review(review=review_text, submitted_by=submittedBy, rating=rating, company=company, user=user) #add user.
             review.save()
             return JsonResponse({"message": "Review created!"})
 
@@ -49,6 +50,7 @@ def getReviews(request, company_id):
             reviews = Review.objects.filter(company=company).values(
                 'review',
                 'rating',
+                'review_date',
                 displayName=F('user__name')  # Access username from CustomUser
             )
             reviews_list = list(reviews)
