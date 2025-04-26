@@ -51,7 +51,8 @@ class Company(models.Model):
     def get_images(self):
         """Returns all images associated with this company."""
         return self.images.all()
-    
+    class Meta:
+        db_table = 'band_app'
 
 
 # class UnverifiedCompany(models.Model):
@@ -105,10 +106,13 @@ class UnverifiedCompany(models.Model):
     def __str__(self):
         return f"Unverified: {self.name} (Submitted by {self.user})"
     
-
+    class Meta:
+        db_table = 'unverifiedband_app'
 
 
 class Recommendation(models.Model):
     rec = models.CharField(max_length=255)
     user = models.ForeignKey(CustomUser, on_delete=models.CASCADE, related_name='users') #add user foreign key
     company = models.ForeignKey(Company, on_delete=models.CASCADE, related_name='companies') #add user foreign key
+    class Meta:
+        db_table = 'band_recommendation'

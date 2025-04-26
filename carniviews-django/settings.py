@@ -43,7 +43,8 @@ INSTALLED_APPS = [
     'review_app',
     "event_app",
     'feedback_app',
-    'company_app',
+    'company_app', #band app
+    'business_app',#for maketplace biz
     'images_app',
     'user_app',
     'corsheaders',  # Keep corsheaders
