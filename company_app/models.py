@@ -34,6 +34,7 @@ class Company(models.Model):
         null=True,
         help_text="Zip Code, Postal Code"  # More internationally recognized term
     )
+    normalized_country = models.CharField(max_length=100)  # Added field to store the company's country
     country = models.CharField(max_length=100)  # Added field to store the company's country
     hours = models.CharField(max_length=255, blank=True, null=True)
     company_type = models.CharField(max_length=100)
@@ -92,6 +93,7 @@ class UnverifiedCompany(models.Model):
         null=True,
         help_text="Zip Code, Postal Code"  # More internationally recognized term
     )
+    normalized_country = models.CharField(max_length=100)  # Added field to store the company's country
     country = models.CharField(max_length=100)  # Added field to store the company's country
     hours = models.CharField(max_length=255, blank=True, null=True)
     contact = models.CharField(max_length=255, blank=True, null=True)

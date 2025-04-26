@@ -70,6 +70,7 @@ def addUnverifiedCompany(request, user_id):
                 contact=company_info.get('contact', ''),
                 website=company_info.get('website', ''),
                 country=company_info.get('country', ''),
+                normalized_country=company_info.get('country', '').lower().replace(' ', ''),               
                 hours=company_info.get('hours', ''),
                 company_type=company_info.get('type', ''),
                 photos=image_urls,
@@ -123,7 +124,8 @@ def addVerifiedCompany(request, user_id):  # Accept user_id from URL
                 state=company_info.get('state', ''),
                 zip_code=company_info.get('zip', ''),
                 hours=company_info.get('hours', ''),
-                contact=company_info.get('contact', ''),
+                country=company_info.get('country', ''),
+                normalized_country=company_info.get('country', '').lower().replace(' ', ''),                contact=company_info.get('contact', ''),
                 website=company_info.get('website', ''),
                 company_type=company_info.get('type', ''),
                 photos=company_info.get('photos', []),
@@ -151,14 +153,14 @@ def addVerifiedCompany(request, user_id):  # Accept user_id from URL
 
 
 
-def getCompanies(request):
+def getCompanies(request, country):
     """
     Retrieves companies with optional skip and limit parameters, sorted by name.
     """
     if request.method == 'GET':
         try:
-            companies = Company.objects.all().order_by('name')  # Sort by name
-            print('get all companies', companies)
+            norm_country = country.lower().replace(" ", ""), 
+            companies = Company.objects.filter(normalized_country=norm_country).order_by('name')  # Filter by 'USA' and then sort by name            print('get all companies', companies)
             skip_str = request.GET.get('skip')
             limit_str = request.GET.get('limit')
 
