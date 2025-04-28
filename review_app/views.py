@@ -52,12 +52,15 @@ def addReview(request, company_id, user_id):
 # @csrf_exempt
 # from django.http import JsonResponse
 # from .models import Company, Review
+from django.db.models import F
 
 def getReviews(request, company_id):
     if request.method == "GET":
         try:
             company = Company.objects.get(id=company_id)
-            reviews = Review.objects.filter(company=company).values(
+            reviews = Review.objects.filter(company=company).annotate(
+                displayName=F('user__name')
+            ).values(
                 'review',
                 'music',
                 'service',
@@ -71,40 +74,45 @@ def getReviews(request, company_id):
                 'rating',
                 'review_date',
                 'id',
-                displayName=F('user__name')  # Access username from CustomUser
+                'displayName'
             )
+
             reviews_list = list(reviews)
+
+            # Get all RevAgreements for the reviews at once
+            review_ids = [review['id'] for review in reviews_list]
+            rev_agreements = RevAgreement.objects.filter(review_id__in=review_ids).values(
+                'id', 'review_id', 'user_id', 'agreement'
+            )
+
+            # Organize agreements by review ID
+            agreements_by_review = {}
+            for agreement in rev_agreements:
+                review_id = agreement['review_id']
+                if review_id not in agreements_by_review:
+                    agreements_by_review[review_id] = []
+                agreements_by_review[review_id].append({
+                    'id': agreement['id'],
+                    'user_id': agreement['user_id'],
+                    'agreement': agreement['agreement']
+                })
+
+            # Attach agreements to each review
+            for review in reviews_list:
+                review_id = review['id']
+                review['revAgreements'] = agreements_by_review.get(review_id, [])
+
             return JsonResponse({"reviews": reviews_list})
+        
         except Company.DoesNotExist:
             return JsonResponse({"error": "Company not found"}, status=404)
         except Exception as e:
             return JsonResponse({"error": str(e)}, status=500)
+
     else:
         return JsonResponse({"error": "Invalid method"}, status=405)
+
     
-@csrf_exempt
-def getRatings(request, company_id):
-    if request.method == "GET":
-        try:
-            company = Company.objects.get(id=company_id)
-            average_rating = Review.objects.filter(company=company).aggregate(Avg('rating'))['rating__avg']
-
-            if average_rating is not None:
-                rounded_average = round(average_rating * 2) / 2.0  # Round to nearest 0.5
-                return JsonResponse({'average_rating': rounded_average})
-            else:
-                return JsonResponse({'average_rating': 0.0})
-
-        except Company.DoesNotExist:
-            return JsonResponse({"error": "Company not found"}, status=404)
-        except Exception as e:
-            return JsonResponse({"error": str(e)}, status=500)
-    else:
-        return JsonResponse({"error": "Invalid method"}, status=405)
-    
-
-
-
 @csrf_exempt
 def addRevAgreement(request):
     if request.method == 'POST':
@@ -132,3 +140,45 @@ def addRevAgreement(request):
             return JsonResponse({'message': 'newRevAgreement successfully created.'}, status=201) # 201 for create
     return JsonResponse({'message': 'newRevAgreement Failed'}, status=500)
 
+
+@csrf_exempt
+def getRatings(request, company_id):
+    if request.method == "GET":
+        try:
+            company = Company.objects.get(id=company_id)
+            average_rating = Review.objects.filter(company=company).aggregate(Avg('rating'))['rating__avg']
+
+            if average_rating is not None:
+                rounded_average = round(average_rating * 2) / 2.0  # Round to nearest 0.5
+                return JsonResponse({'average_rating': rounded_average})
+            else:
+                return JsonResponse({'average_rating': 0.0})
+
+        except Company.DoesNotExist:
+            return JsonResponse({"error": "Company not found"}, status=404)
+        except Exception as e:
+            return JsonResponse({"error": str(e)}, status=500)
+    else:
+        return JsonResponse({"error": "Invalid method"}, status=405)
+    
+
+
+
+
+
+# @csrf_exempt
+# def getReviewAgreements(request, company_id):
+#     if request.method == 'GET':
+#         companyId = company_id
+#         company = RevAgreement.objects.get(id=companyId)
+#         recs = Recommendation.objects.filter(company=company).values(
+#             'rec',
+#             'user_id'
+#         )
+
+#         allRecs=list(recs)
+#         print('show me dictorary list DAREN', allRecs)
+#         return JsonResponse({'message': 'Recommondation successfully retrieved', "allRecs": allRecs}, status=201)
+#     return JsonResponse({'message': 'Recommondation Failed'}, status=500)
+
+#     None
