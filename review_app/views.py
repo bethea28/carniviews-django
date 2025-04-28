@@ -2,6 +2,7 @@ from django.http import JsonResponse
 from django.views.decorators.csrf import csrf_exempt
 import json
 from .models import Review
+from .models import RevAgreement
 from company_app.models import Company
 from django.contrib.auth.decorators import login_required  # Import login_required
 from user_app.models import CustomUser
@@ -69,6 +70,7 @@ def getReviews(request, company_id):
                 'pickup',
                 'rating',
                 'review_date',
+                'id',
                 displayName=F('user__name')  # Access username from CustomUser
             )
             reviews_list = list(reviews)
@@ -99,3 +101,34 @@ def getRatings(request, company_id):
             return JsonResponse({"error": str(e)}, status=500)
     else:
         return JsonResponse({"error": "Invalid method"}, status=405)
+    
+
+
+
+@csrf_exempt
+def addRevAgreement(request):
+    if request.method == 'POST':
+        request_data = json.loads(request.body)
+        # companyId = request_data.get('company_id','')
+        reviewId = request_data.get('reviewId','')
+        userId = request_data.get('user_id','')
+        agreement = request_data.get('agreement','')
+        
+        user = get_object_or_404(CustomUser, id=userId)
+        review = get_object_or_404(Review, id=reviewId)
+
+        # Check if a recommendation already exists for this user and company
+        existing_revAgreement = RevAgreement.objects.filter(user=user, review=review).first()
+
+        if existing_revAgreement:
+            # Update the existing recommendation
+            existing_revAgreement.agreement = agreement
+            existing_revAgreement.save()
+            return JsonResponse({'message': 'newRevAgreement successfully updated.'}, status=200)  # Use 200 for update
+        else:
+            # Create a new recommendation
+            newRevAgreement = RevAgreement(agreement=agreement, user=user, review=review)
+            newRevAgreement.save()
+            return JsonResponse({'message': 'newRevAgreement successfully created.'}, status=201) # 201 for create
+    return JsonResponse({'message': 'newRevAgreement Failed'}, status=500)
+

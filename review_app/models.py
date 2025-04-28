@@ -24,3 +24,15 @@ class Review(models.Model):
 
     def __str__(self):
         return f"Review: '{self.review[:50]}...', Rating: {self.rating}, Company: {self.company.name}, User: {self.user.username}"
+    
+
+
+
+
+
+class RevAgreement(models.Model):
+    agreement = models.CharField(max_length=255)
+    user = models.ForeignKey(CustomUser, on_delete=models.CASCADE, related_name='review_users') #add user foreign key
+    review = models.ForeignKey(Review, on_delete=models.CASCADE, related_name='reviews') #add user foreign key
+    class Meta:
+        db_table = 'review_agreement'
