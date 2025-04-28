@@ -39,6 +39,7 @@ class Company(models.Model):
     hours = models.CharField(max_length=255, blank=True, null=True)
     company_type = models.CharField(max_length=100)
     photos = models.JSONField(default=dict)
+    socials =models.JSONField(default=dict)
     contact = models.CharField(max_length=255, blank=True, null=True)
     website = models.URLField(max_length=255)  # Use URLField
     hoursData = models.JSONField(default=dict)
@@ -98,6 +99,7 @@ class UnverifiedCompany(models.Model):
     hours = models.CharField(max_length=255, blank=True, null=True)
     contact = models.CharField(max_length=255, blank=True, null=True)
     company_type = models.CharField(max_length=100)
+    socials =models.JSONField(default=dict)
     photos = models.JSONField(default=dict)
     website = models.URLField(max_length=255)  # Use URLField
     hoursData = models.JSONField(default=dict)

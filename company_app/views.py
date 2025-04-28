@@ -194,10 +194,12 @@ def getCompanies(request, country):
             #     description=company_info.get('description', ''),
             #     user=user  # Associate with the user from URL
             # )
+            # print('GET COMPANIES SOCIALS', company)
             for company in companies:
                 company_data = {
                     'id': company.id,
                     'companyInfo': {
+                        'socials': company.socials,
                         'name': company.name,
                         'address_line1': company.address_line1,
                         'address_line2': company.address_line2,
