@@ -183,7 +183,7 @@ def addEvent(request, user_id):
 
 
 @csrf_exempt
-def getAllEvents(request):
+def getAllEvents(request, country):
     """
     Retrieves all events and returns them as JSON.
     Matches the structure used in addEvent view (with extended address fields).
@@ -192,8 +192,7 @@ def getAllEvents(request):
 
     if request.method == 'GET':
         try:
-            events = Event.objects.all()
-
+            events = Event.objects.filter(country=country).order_by('name')
             events_data = []
             for event in events:
                 # Get all associated images
@@ -235,7 +234,7 @@ def getAllEvents(request):
                 }
 
                 events_data.append(event_data)
-
+            print('events data all',event_data)
             return JsonResponse({'events': events_data}, status=200, safe=False)
 
         except Exception as e:

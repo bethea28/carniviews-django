@@ -5,6 +5,6 @@ urlpatterns = [
     path('<int:user_id>/addEvent/', views.addEvent, name='addEvent'),
         # path('<int:user_id>/addVerifiedCompany/', views.addVerifiedCompany, name='add_verified_company'),  # /companies/add/
 
-    path('getAllEvents/', views.getAllEvents, name='getAllEvents'),
+    path('<str:country>/getAllEvents/', views.getAllEvents, name='getAllEvents'),
    
 ]

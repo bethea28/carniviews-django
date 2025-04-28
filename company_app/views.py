@@ -157,10 +157,12 @@ def getCompanies(request, country):
     """
     Retrieves companies with optional skip and limit parameters, sorted by name.
     """
+    # return 
     if request.method == 'GET':
         try:
             norm_country = country.lower().replace(" ", ""), 
-            companies = Company.objects.filter(normalized_country=norm_country).order_by('name')  # Filter by 'USA' and then sort by name            print('get all companies', companies)
+            companies = Company.objects.filter(country=country).order_by('name')  # Filter by 'USA' and then sort by name            print('get all companies', companies)
+            # companies = Company.objects.filter(normalized_country=norm_country).order_by('name')  # Filter by 'USA' and then sort by name            print('get all companies', companies)
             skip_str = request.GET.get('skip')
             limit_str = request.GET.get('limit')
 
@@ -173,7 +175,6 @@ def getCompanies(request, country):
             if limit_str is not None and limit_str.isdigit():
                 end = int(limit_str)
                 companies = companies[:end]
-            print('getting all companies now', companies)
             # return
             company_list = []
 
