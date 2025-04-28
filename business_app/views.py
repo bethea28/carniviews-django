@@ -77,13 +77,14 @@ def addBusiness(request, user_id):  # Accept user_id from URL
 
 
 
-def getBusinesses(request):
+def getBusinesses(request, country):
     """
     Retrieves companies with optional skip and limit parameters, sorted by name.
     """
+    print('get')
     if request.method == 'GET':
         try:
-            businesses = Business.objects.all().order_by('name')  # Sort by name
+            businesses = Business.objects.filter(country=country).order_by('name')  # Sort by name
             print('get all companies', businesses)
             skip_str = request.GET.get('skip')
             limit_str = request.GET.get('limit')
