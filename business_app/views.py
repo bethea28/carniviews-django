@@ -39,21 +39,23 @@ def addBusiness(request, user_id):  # Accept user_id from URL
 
             # Get the user object based on user_id
             user = get_object_or_404(CustomUser, id=user_id) #get user object by user id.
-            all = CustomUser.objects.all()
-            print('BUSIENA ADDING NOW',user )
+            print('BUSIENA ADDING NOW',company_info )
             # Create Company object, populating individual fields
+
             business = Business(
                 name=name,
-                address=company_info.get('address', ''),
+                # socials=company_info.get('socials', ''),
+                address_line1=company_info.get('addressLine1', ''),
+                address_line2=company_info.get('addressLine2', ''),
                 city=company_info.get('city', ''),
-                state=company_info.get('state', ''),
-                zip_code=company_info.get('zip', ''),
+                region=company_info.get('region', ''),
+                postal_code=company_info.get('postal', ''),
                 hours=company_info.get('hours', ''),
                 contact=company_info.get('contact', ''),
-                website=company_info.get('website', ''),
+                country=company_info.get('country', ''),
                 company_type=company_info.get('type', ''),
+                website=company_info.get('website', ""),
                 photos=company_info.get('photos', []),
-                hoursData=hours_data,
                 description=company_info.get('description', ''),
                 user=user 
             )
