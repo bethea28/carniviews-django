@@ -234,7 +234,6 @@ def getAllEvents(request, country):
                 }
 
                 events_data.append(event_data)
-            print('events data all',event_data)
             return JsonResponse({'events': events_data}, status=200, safe=False)
 
         except Exception as e:
