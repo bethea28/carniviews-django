@@ -48,7 +48,9 @@ INSTALLED_APPS = [
     'company_app', #band app
     'business_app',#for maketplace biz
     'images_app',
+    'pgfuzzy',
     'user_app',
+    'utils_app',
     'corsheaders',  # Keep corsheaders
     'django.contrib.sites',  # Required for allauth
     'allauth',

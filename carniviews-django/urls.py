@@ -20,6 +20,7 @@ urlpatterns = [
     path('event/', include('event_app.urls')),
     path('business/', include('business_app.urls')),
     path('feedback/', include('feedback_app.urls')),
+    path('duplicates/', include('utils_app.urls')),
     path('company/', include('company_app.urls')),  # Group under /companies/
     path('bryan/', include('book_app.urls')),
     path('admin/', admin.site.urls),
