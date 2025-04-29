@@ -15,6 +15,7 @@ from django.http import JsonResponse
 from django.views.decorators.csrf import csrf_exempt
 import json
 from .models import Business
+from .models import UnverifiedBusiness
 from images_app.models import Image
 from django.shortcuts import get_object_or_404
 from user_app.models import CustomUser
@@ -76,6 +77,61 @@ def addBusiness(request, user_id):  # Accept user_id from URL
     else:
         return JsonResponse({'error': 'Method not allowed'}, status=405)
     
+
+@csrf_exempt
+def addUnverifiedBusiness(request, user_id):
+    """
+    Creates an UnverifiedCompany object and associated Image objects from a JSON request body.
+    """
+    if request.method == 'POST':
+        try:
+            request_data = json.loads(request.body)
+            company_info = request_data.get('companyInfo', {})
+            image_urls = request_data.get('imageUrls', [])
+            hours_data = request_data.get('hoursData', {})
+
+            # Get the user object based on user_id
+            user = get_object_or_404(CustomUser, id=user_id)
+            print('HERE IS MY UNVERIFIED COMP', company_info)
+
+            # Create Business object (assuming you want to create a regular Business now)
+            business = UnverifiedBusiness(
+                name=company_info.get('name', ''),
+                address_line1=company_info.get('addressLine1', ''),
+                address_line2=company_info.get('addressLine2', ''),
+                city=company_info.get('city', ''),
+                region=company_info.get('region', ''),
+                postal_code=company_info.get('postal', ''),
+                contact=company_info.get('contact', ''),
+                website=company_info.get('website', ''),
+                country=company_info.get('country', ''),
+                # normalized_country=company_info.get('country', '').lower().replace(' ', ''),
+                hours=company_info.get('hours', ''),
+                company_type=company_info.get('type', ''),
+                hoursData=hours_data,
+                description=company_info.get('description', ''),
+                user=user  # Associate with the user from URL
+            )
+
+            business.save()
+
+            # Create Image objects and associate them with the Business
+            for image_url in image_urls:
+                Image.objects.create(
+                    business=business,  # Changed to associate with Business
+                    user=user,
+                    image_url=image_url
+                )
+            return JsonResponse({'message': 'Business and images created successfully'}, status=201)
+
+        except json.JSONDecodeError:
+            return JsonResponse({'error': 'Invalid JSON in request body'}, status=400)
+        except KeyError as e:
+            return JsonResponse({'error': f'Missing key in request body: {e}'}, status=400)
+        except Exception as e:
+            return JsonResponse({'error': str(e)}, status=500)
+    else:
+        return JsonResponse({'error': 'Method not allowed'}, status=405)
 
 
 
