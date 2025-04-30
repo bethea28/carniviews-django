@@ -6,6 +6,7 @@ from .models import Event, EventImage  # Import both Event and EventImage
 from user_app.models import CustomUser
 import logging
 from datetime import datetime
+from dateutil import parser as dateutil_parser
 
 logger = logging.getLogger(__name__)
 
@@ -127,6 +128,7 @@ def addEvent(request, user_id):
                             f"Invalid time format: {time_str}.  Use HH:MM:SS or H:MM AM/PM"
                         )
 
+            date_obj = event_hours.get('date')
             start_time_obj = event_hours.get('start')
             end_time_obj = event_hours.get('end')
             print('test hour n start adding' , event_hours.get('start'))
@@ -144,6 +146,7 @@ def addEvent(request, user_id):
                 country=event_info.get('country', ''),
                 price=event_info.get('price', ''),
                 ticket=event_info.get('ticket', ''),
+                date=date_obj,  # Store as TimeField
                 start_time=start_time_obj,  # Store as TimeField
                 end_time=end_time_obj,  # Store as TimeField
                 type=event_info.get('type', ''),
@@ -180,7 +183,107 @@ def addEvent(request, user_id):
             return JsonResponse({'error': str(e)}, status=500)
     else:
         return JsonResponse({'error': 'Method not allowed'}, status=405)
+@csrf_exempt
+def editEvent(request, event_id=None):
+    """
+    Updates an Event and its associated EventImages.
+    Only updates fields provided in the request.
+    """
+    logger.debug('Received event request body: %s', request.body)
 
+    if request.method != 'POST':
+        return JsonResponse({'error': 'Method not allowed'}, status=405)
+
+    try:
+        request_data = json.loads(request.body)
+        event_info = request_data.get('eventInfo', {})
+        image_data_list = request_data.get('allImages', [])
+        event_hours = request_data.get('eventHours', {})
+
+
+        def parse_time(time_str):
+            if not time_str:
+                return None
+            try:
+                # Handles "HH:MM AM/PM" and "HH:MM:SS"
+                return datetime.strptime(time_str, "%I:%M %p").time()
+            except ValueError:
+                try:
+                    return datetime.strptime(time_str, "%H:%M:%S").time()
+                except ValueError:
+                    try:
+                        # Handles ISO 8601 (e.g., "2025-04-30T05:42:00.000Z")
+                        return dateutil_parser.parse(time_str).time()
+                    except Exception:
+                        logger.error(f"Invalid time format: {time_str}")
+                        raise ValueError(
+                            f"Invalid time format: {time_str}. Use HH:MM AM/PM, HH:MM:SS, or ISO format"
+                        )
+
+        if not event_id:
+            return JsonResponse({'error': 'Missing event ID'}, status=400)
+
+        event = get_object_or_404(Event, id=event_id)
+        logger.info(f"Updating existing event with ID {event_id}")
+
+        # Update only provided fields in eventInfo
+        if 'name' in event_info:
+            event.name = event_info['name']
+        if 'addressLine1' in event_info:
+            event.address_line1 = event_info['addressLine1']
+        if 'addressLine2' in event_info:
+            event.address_line2 = event_info['addressLine2']
+        if 'city' in event_info:
+            event.city = event_info['city']
+        if 'region' in event_info:
+            event.region = event_info['region']
+        if 'postal' in event_info:
+            event.postal_code = event_info['postal']
+        if 'country' in event_info:
+            event.country = event_info['country']
+        if 'price' in event_info:
+            event.price = event_info['price']
+        if 'ticket' in event_info:
+            event.ticket = event_info['ticket']
+        if 'type' in event_info:
+            event.type = event_info['type']
+        if 'description' in event_info:
+            event.description = event_info['description']
+
+        # Update only provided time/date fields
+        if 'date' in event_hours:
+            event.date = event_hours['date']
+        if 'start' in event_hours:
+            event.start_time = parse_time(event_hours['start'])
+        if 'end' in event_hours:
+            event.end_time = parse_time(event_hours['end'])
+
+        event.save()
+
+        # Replace images only if new ones are provided
+        if image_data_list:
+            EventImage.objects.filter(event=event).delete()
+            for image_data in image_data_list:
+                image_uri = image_data.get('uri')
+                if image_uri:
+                    EventImage.objects.create(
+                        event=event,
+                        image={'uri': image_uri},
+                    )
+
+        return JsonResponse({
+            'message': 'Event updated successfully',
+            'eventId': event.id
+        }, status=200)
+
+    except json.JSONDecodeError as e:
+        logger.error('JSONDecodeError: %s', e)
+        return JsonResponse({'error': 'Invalid JSON in request body'}, status=400)
+    except ValueError as e:
+        return JsonResponse({'error': str(e)}, status=400)
+    except Exception as e:
+        logger.error('Exception: %s', e, exc_info=True)
+        return JsonResponse({'error': str(e)}, status=500)
 
 @csrf_exempt
 def getAllEvents(request, country):
@@ -225,6 +328,7 @@ def getAllEvents(request, country):
                     'country': event.country,
                     'price': event.price,
                     'ticket': event.ticket,
+                    'date': str(event.date),
                     'start_time': str(event.start_time),
                     'end_time': str(event.end_time),
                     'type': event.type,

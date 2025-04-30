@@ -41,6 +41,7 @@ class Event(models.Model):
     )
     country = models.CharField(max_length=100)  # Added field to store the company's country
     price = models.CharField(max_length=100)
+    date = models.CharField(max_length=50)
     start_time = models.CharField(max_length=50)
     end_time = models.CharField(max_length=50)
     type = models.CharField(max_length=255)
