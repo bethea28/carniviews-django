@@ -284,31 +284,37 @@ def editEvent(request, event_id=None):
     except Exception as e:
         logger.error('Exception: %s', e, exc_info=True)
         return JsonResponse({'error': str(e)}, status=500)
+from django.utils import timezone
+from datetime import timedelta
 
 @csrf_exempt
 def getAllEvents(request, country):
     """
     Retrieves all events and returns them as JSON.
-    Matches the structure used in addEvent view (with extended address fields).
+    Also deletes events older than 1 day before the current date.
     """
     logger.debug('Entering getAllEvents view')
 
     if request.method == 'GET':
         try:
+            # Delete events more than 1 day old
+            cutoff_date = timezone.now().date() - timedelta(days=1)
+            old_events = Event.objects.filter(date__lt=cutoff_date)
+            deleted_count, _ = old_events.delete()
+            logger.info(f'Deleted {deleted_count} old events')
+
+            # Fetch current events by country
             events = Event.objects.filter(country=country).order_by('name')
             events_data = []
-            for event in events:
-                # Get all associated images
-                images = EventImage.objects.filter(event=event)
-                image_uris = []
-                for image in images:
-                    if isinstance(image.image, dict) and 'uri' in image.image:
-                        image_uris.append({'uri': image.image['uri']})
-                    else:
-                        logger.warning(f"Invalid image data for EventImage {image.id}")
-                        image_uris.append({'uri': None})
 
-                # Get user info
+            for event in events:
+                images = EventImage.objects.filter(event=event)
+                image_uris = [
+                    {'uri': image.image['uri']} if isinstance(image.image, dict) and 'uri' in image.image
+                    else {'uri': None}
+                    for image in images
+                ]
+
                 user = event.user
                 user_data = {
                     'id': user.id,
@@ -338,6 +344,7 @@ def getAllEvents(request, country):
                 }
 
                 events_data.append(event_data)
+
             return JsonResponse({'events': events_data}, status=200, safe=False)
 
         except Exception as e:
