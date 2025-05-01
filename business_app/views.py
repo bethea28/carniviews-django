@@ -21,9 +21,7 @@ from django.shortcuts import get_object_or_404
 from user_app.models import CustomUser
 from django.db.models import F
 
-@csrf_exempt
    
-
 @csrf_exempt
 def addBusiness(request, user_id):  # Accept user_id from URL
     """
@@ -39,26 +37,33 @@ def addBusiness(request, user_id):  # Accept user_id from URL
             hours_data = request_data.get('hoursData', {})
 
             # Get the user object based on user_id
-            user = get_object_or_404(CustomUser, id=user_id) #get user object by user id.
-            print('BUSIENA ADDING NOW',company_info )
-            # Create Company object, populating individual fields
+            user = get_object_or_404(CustomUser, id=user_id)
+            print('BUSINESS ADDING NOW', company_info)
 
+            # Create Company object, populating individual fields
             business = Business(
                 name=name,
-                # socials=company_info.get('socials', ''),
                 address_line1=company_info.get('addressLine1', ''),
                 address_line2=company_info.get('addressLine2', ''),
                 city=company_info.get('city', ''),
                 region=company_info.get('region', ''),
                 postal_code=company_info.get('postal', ''),
                 hours=company_info.get('hours', ''),
-                contact=company_info.get('contact', ''),
+                # contact=company_info.get('contact', ''),
                 country=company_info.get('country', ''),
                 company_type=company_info.get('type', ''),
-                website=company_info.get('website', ""),
-                photos=company_info.get('photos', []),
+                website=company_info.get('website', ''),
+                photos=company_info.get('photos', {}),
                 description=company_info.get('description', ''),
-                user=user 
+                user=user,
+
+                # New fields
+                phone=company_info.get('phone', ''),
+                email=company_info.get('email', ''),
+                facebook=company_info.get('facebook', ''),
+                instagram=company_info.get('instagram', ''),
+                twitter=company_info.get('twitter', ''),
+                hoursData=hours_data
             )
             business.save()
 
@@ -76,12 +81,11 @@ def addBusiness(request, user_id):  # Accept user_id from URL
             return JsonResponse({'error': str(e)}, status=500)
     else:
         return JsonResponse({'error': 'Method not allowed'}, status=405)
-    
 
 @csrf_exempt
 def addUnverifiedBusiness(request, user_id):
     """
-    Creates an UnverifiedCompany object and associated Image objects from a JSON request body.
+    Creates an UnverifiedBusiness object and associated Image objects from a JSON request body.
     """
     if request.method == 'POST':
         try:
@@ -94,7 +98,7 @@ def addUnverifiedBusiness(request, user_id):
             user = get_object_or_404(CustomUser, id=user_id)
             print('HERE IS MY UNVERIFIED COMP', company_info)
 
-            # Create Business object (assuming you want to create a regular Business now)
+            # Create UnverifiedBusiness object
             business = UnverifiedBusiness(
                 name=company_info.get('name', ''),
                 address_line1=company_info.get('addressLine1', ''),
@@ -102,15 +106,22 @@ def addUnverifiedBusiness(request, user_id):
                 city=company_info.get('city', ''),
                 region=company_info.get('region', ''),
                 postal_code=company_info.get('postal', ''),
-                contact=company_info.get('contact', ''),
-                website=company_info.get('website', ''),
                 country=company_info.get('country', ''),
-                # normalized_country=company_info.get('country', '').lower().replace(' ', ''),
                 hours=company_info.get('hours', ''),
                 company_type=company_info.get('type', ''),
+                photos={},  # Initialize with empty dict or replace if provided
+                # contact=company_info.get('contact', ''),  # fallback if 'contact' is used
+                website=company_info.get('website', ''),
                 hoursData=hours_data,
                 description=company_info.get('description', ''),
-                user=user  # Associate with the user from URL
+                user=user,
+
+                # New fields
+                phone=company_info.get('phone', ''),
+                email=company_info.get('email', ''),
+                facebook=company_info.get('facebook', ''),
+                instagram=company_info.get('instagram', ''),
+                twitter=company_info.get('twitter', ''),
             )
 
             business.save()
@@ -118,10 +129,11 @@ def addUnverifiedBusiness(request, user_id):
             # Create Image objects and associate them with the Business
             for image_url in image_urls:
                 Image.objects.create(
-                    business=business,  # Changed to associate with Business
+                    business=business,
                     user=user,
                     image_url=image_url
                 )
+
             return JsonResponse({'message': 'Business and images created successfully'}, status=201)
 
         except json.JSONDecodeError:
@@ -134,7 +146,6 @@ def addUnverifiedBusiness(request, user_id):
         return JsonResponse({'error': 'Method not allowed'}, status=405)
 
 
-
 def getBusinesses(request, country):
     """
     Retrieves companies with optional skip and limit parameters, sorted by name.
@@ -144,21 +155,17 @@ def getBusinesses(request, country):
         try:
             businesses = Business.objects.filter(country=country).order_by('name')  # Sort by name
             print('get all companies', businesses)
+
             skip_str = request.GET.get('skip')
             limit_str = request.GET.get('limit')
 
-            start = 0
-            if skip_str is not None and skip_str.isdigit():
-                start = int(skip_str)
-                companies = companies[start:]
+            start = int(skip_str) if skip_str and skip_str.isdigit() else 0
+            end = start + int(limit_str) if limit_str and limit_str.isdigit() else None
 
-            end = None
-            if limit_str is not None and limit_str.isdigit():
-                end = int(limit_str)
-                companies = companies[:end]
-            # return
+            # Apply slicing
+            businesses = businesses[start:end] if end else businesses[start:]
+
             company_list = []
-
 
             for business in businesses:
                 company_data = {
@@ -168,19 +175,23 @@ def getBusinesses(request, country):
                         'address_line1': business.address_line1,
                         'address_line2': business.address_line2,
                         'city': business.city,
-                        "region":business.region,
+                        'region': business.region,
                         'postal_code': business.postal_code,
-                        'contact': business.contact,
+                        # 'contact': business.contact,
                         'country': business.country,
                         'hours': business.hours,
-                        "website": business.website,
+                        'website': business.website,
                         'company_type': business.company_type,
                         'photos': business.photos,
                         'description': business.description,
+                        'phone': business.phone,
+                        'email': business.email,
+                        'facebook': business.facebook,
+                        'instagram': business.instagram,
+                        'twitter': business.twitter,
                     },
                     'hoursData': business.hoursData,
-                    # 'images': [{'id': image.id, 'image_url': image.image_url} for image in company.images.all()]  
-                      }
+                }
                 company_list.append(company_data)
 
             return JsonResponse(company_list, safe=False)
@@ -189,5 +200,3 @@ def getBusinesses(request, country):
             return JsonResponse({'error': str(e)}, status=500)
     else:
         return JsonResponse({'error': 'Method not allowed'}, status=405)
-    
-

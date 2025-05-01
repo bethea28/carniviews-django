@@ -21,7 +21,7 @@ def duplicationCheck(request):
             sql = ""
             table_name = ""
             if type.lower() == 'business':
-                table_name = 'business_app_business'  # Replace with your actual business table name
+                table_name = 'business_app_unverifiedbusiness'  # Replace with your actual business table name
                 sql = f"""
                     SELECT id, name, country,
                            similarity(name, %s) AS name_similarity
