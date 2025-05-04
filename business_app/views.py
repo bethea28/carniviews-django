@@ -145,6 +145,116 @@ def addUnverifiedBusiness(request, user_id):
     else:
         return JsonResponse({'error': 'Method not allowed'}, status=405)
 
+@csrf_exempt
+def editVerifiedBusiness(request, biz_id):
+    """
+    Creates an UnverifiedBusiness object and associated Image objects from a JSON request body.
+    """
+    if request.method == 'PUT':
+
+        try:
+            request_data = json.loads(request.body)
+            company_info = request_data.get('companyInfo', {})
+            image_urls = request_data.get('imageUrls', [])
+            hours_data = request_data.get('hoursData', {})
+            print('request body edit', request_data)
+            # Get the user object based on user_id
+            business = get_object_or_404(Business, id=biz_id)
+            print('HERE IS MY UNVERIFIED COMP', request_data)
+            # return 
+# Update only provided fields in eventInfo
+                    # Update only provided fields from company_info
+            if 'name' in company_info:
+                business.name = company_info['name']
+            if 'address_line1' in company_info:
+                business.address_line1 = company_info['address_line1']
+            if 'address_line2' in company_info:
+                business.address_line2 = company_info['address_line2']
+            if 'city' in company_info:
+                business.city = company_info['city']
+            if 'region' in company_info:
+                business.region = company_info['region']
+            if 'postal_code' in company_info:
+                business.postal_code = company_info['postal_code']
+            if 'country' in company_info:
+                business.country = company_info['country']
+            if 'hours' in company_info:
+                business.hours = company_info['hours']
+            if 'company_type' in company_info:
+                business.company_type = company_info['company_type']
+            if 'photos' in company_info:
+                business.photos = company_info['photos']
+            if 'website' in company_info:
+                business.website = company_info['website']
+            if 'description' in company_info:
+                business.description = company_info['description']
+            if 'phone' in company_info:
+                business.phone = company_info['phone']
+            if 'email' in company_info:
+                business.email = company_info['email']
+            if 'facebook' in company_info:
+                business.facebook = company_info['facebook']
+            if 'instagram' in company_info:
+                business.instagram = company_info['instagram']
+            if 'twitter' in company_info:
+                business.twitter = company_info['twitter']
+
+            # Also update these if present
+            if hours_data:
+                business.hoursData = hours_data
+            # if user:
+            #     business.user = user
+
+            # Save the updated business object
+            business.save()
+
+            # Create UnverifiedBusiness object
+            # business = Business(
+            #     name=company_info.get('name', ''),
+            #     address_line1=company_info.get('addressLine1', ''),
+            #     address_line2=company_info.get('addressLine2', ''),
+            #     city=company_info.get('city', ''),
+            #     region=company_info.get('region', ''),
+            #     postal_code=company_info.get('postal', ''),
+            #     country=company_info.get('country', ''),
+            #     hours=company_info.get('hours', ''),
+            #     company_type=company_info.get('type', ''),
+            #     photos={},  # Initialize with empty dict or replace if provided
+            #     # contact=company_info.get('contact', ''),  # fallback if 'contact' is used
+            #     website=company_info.get('website', ''),
+            #     hoursData=hours_data,
+            #     description=company_info.get('description', ''),
+            #     user=user,
+
+            #     # New fields
+            #     phone=company_info.get('phone', ''),
+            #     email=company_info.get('email', ''),
+            #     facebook=company_info.get('facebook', ''),
+            #     instagram=company_info.get('instagram', ''),
+            #     twitter=company_info.get('twitter', ''),
+            # )
+
+            # business.save()
+
+            # Create Image objects and associate them with the Business
+            for image_url in image_urls:
+                Image.objects.create(
+                    business=business,
+                    user=user,
+                    image_url=image_url
+                )
+
+            return JsonResponse({'message': 'Business and images created successfully'}, status=201)
+
+        except json.JSONDecodeError:
+            return JsonResponse({'error': 'Invalid JSON in request body'}, status=400)
+        except KeyError as e:
+            return JsonResponse({'error': f'Missing key in request body: {e}'}, status=400)
+        except Exception as e:
+            return JsonResponse({'error': str(e)}, status=500)
+    else:
+        return JsonResponse({'error': 'Method not allowed'}, status=405)
+
 
 def getBusinesses(request, country):
     """

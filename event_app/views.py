@@ -191,7 +191,7 @@ def editEvent(request, event_id=None):
     """
     logger.debug('Received event request body: %s', request.body)
 
-    if request.method != 'POST':
+    if request.method != 'PUT':
         return JsonResponse({'error': 'Method not allowed'}, status=405)
 
     try:
