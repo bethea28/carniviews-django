@@ -160,22 +160,22 @@ def editVerifiedBusiness(request, biz_id):
             print('request body edit', request_data)
             # Get the user object based on user_id
             business = get_object_or_404(Business, id=biz_id)
-            print('HERE IS MY UNVERIFIED COMP', request_data)
+            print('COMPANY INFO LUCCI', company_info)
             # return 
 # Update only provided fields in eventInfo
                     # Update only provided fields from company_info
             if 'name' in company_info:
                 business.name = company_info['name']
-            if 'address_line1' in company_info:
-                business.address_line1 = company_info['address_line1']
-            if 'address_line2' in company_info:
-                business.address_line2 = company_info['address_line2']
+            if 'addressLine1' in company_info:
+                business.address_line1 = company_info['addressLine1']
+            if 'addressLine2' in company_info:
+                business.address_line2 = company_info['addressLine2']
             if 'city' in company_info:
                 business.city = company_info['city']
             if 'region' in company_info:
                 business.region = company_info['region']
-            if 'postal_code' in company_info:
-                business.postal_code = company_info['postal_code']
+            if 'postal' in company_info:
+                business.postal_code = company_info['postal']
             if 'country' in company_info:
                 business.country = company_info['country']
             if 'hours' in company_info:
