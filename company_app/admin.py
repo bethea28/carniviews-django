@@ -58,12 +58,12 @@ def verify_company_admin_action(modeladmin, request, queryset):
 class UnverifiedCompanyAdmin(admin.ModelAdmin):
     # ... your other admin configurations ...
     actions = [verify_company_admin_action]  # Add the action here
-    list_display = ['name', 'user', 'submitted_at']
+    list_display = ['name', 'user', 'submitted_at',"id"]
     # Removed the verify_link,  admin actions are the preferred way to do this in the admin
 
 @admin.register(Company)  # Register the Verified Company model
 class CompanyAdmin(admin.ModelAdmin):
-    list_display = ['name', 'user', 'submitted_at']
+    list_display = ['name', 'user', 'submitted_at',"id"]
     # ... your admin configurations for verified companies
 
 

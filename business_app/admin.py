@@ -37,6 +37,7 @@ def verify_business_admin_action(modeladmin, request, queryset):
                 instagram=unverified_company.instagram,
                 twitter=unverified_company.twitter,
                 website=unverified_company.website,
+                id=unverified_company.id
                 # contact=unverified_company.contact,
             )
             verified_company.save()
@@ -58,8 +59,8 @@ verify_business_admin_action.short_description = "Verify selected businesses"
 @admin.register(UnverifiedBusiness)
 class UnverifiedCompanyAdmin(admin.ModelAdmin):
     actions = [verify_business_admin_action]
-    list_display = ['name', 'user', 'submitted_at', 'email', 'phone', 'country']
+    list_display = ['name', 'user', 'submitted_at', 'email', 'phone', 'country',"id"]
 
 @admin.register(Business)
 class CompanyAdmin(admin.ModelAdmin):
-    list_display = ['name', 'user', 'submitted_at', 'email', 'phone', 'country']
+    list_display = ['name', 'user', 'submitted_at', 'email', 'phone', 'country',"id"]
