@@ -63,7 +63,7 @@ def addEditSuggestion(request):
         )
         edit_suggestion.save()
 
-        return JsonResponse({'message': 'Edit suggestion submitted successfully.'}, status=201)
+        return JsonResponse({'message': 'success'}, status=201)
 
     except json.JSONDecodeError:
         return JsonResponse({'error': 'Invalid JSON data in request body.'}, status=400)

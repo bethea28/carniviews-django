@@ -96,7 +96,7 @@ def addUnverifiedBusiness(request, user_id):
 
             # Get the user object based on user_id
             user = get_object_or_404(CustomUser, id=user_id)
-            print('HERE IS MY UNVERIFIED COMP', company_info)
+            print('HERE IS MY UNVERIFIED COMP', image_urls)
 
             # Create UnverifiedBusiness object
             business = UnverifiedBusiness(
@@ -109,7 +109,7 @@ def addUnverifiedBusiness(request, user_id):
                 country=company_info.get('country', ''),
                 hours=company_info.get('hours', ''),
                 company_type=company_info.get('type', ''),
-                photos={},  # Initialize with empty dict or replace if provided
+                photos=image_urls,  # Initialize with empty dict or replace if provided
                 # contact=company_info.get('contact', ''),  # fallback if 'contact' is used
                 website=company_info.get('website', ''),
                 hoursData=hours_data,
