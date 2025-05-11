@@ -112,7 +112,7 @@ def addEvent(request, user_id):
 
             # Get the user object based on user_id from the URL
             user = get_object_or_404(CustomUser, id=user_id)
-            print('event info now requestData', request_data)
+            print('event info now requestData image_data_list', image_data_list)
             # Parse time strings into datetime.time objects
             def parse_time(time_str):
                 if not time_str:
@@ -131,7 +131,7 @@ def addEvent(request, user_id):
             date_obj = event_hours.get('date')
             start_time_obj = event_hours.get('start')
             end_time_obj = event_hours.get('end')
-            print('test hour n start adding' , event_hours.get('start'))
+            print('test hour n start adding' , )
             # print('test hour n start ow  the full obj', start_time_obj)
             # Create Event object
             # return
@@ -145,6 +145,7 @@ def addEvent(request, user_id):
                 postal_code=event_info.get('postal', ''),
                 country=event_info.get('country', ''),
                 price=event_info.get('price', ''),
+                photos=image_data_list,
                 ticket=event_info.get('ticket', ''),
                 date=date_obj,  # Store as TimeField
                 start_time=start_time_obj,  # Store as TimeField
@@ -155,17 +156,17 @@ def addEvent(request, user_id):
             event.save()
 
             # Create EventImage objects and associate them with the Event
-            for image_data in image_data_list:  # Iterate through the list of image data
-                image_uri = image_data.get('uri')  # Extract the URI
-                if image_uri:  # Only create EventImage if URI is present
-                    event_image = EventImage(
-                        event=event,
-                        image={'uri': image_uri},  # Store the URI in the JSONField
-                    )
-                    event_image.save()
-                else:
-                    logger.warning(
-                        f"Image URI is missing for an image in event {event.id}")  # Log warning
+            # for image_data in image_data_list:  # Iterate through the list of image data
+            #     image_uri = image_data.get('uri')  # Extract the URI
+            #     if image_uri:  # Only create EventImage if URI is present
+            #         event_image = EventImage(
+            #             event=event,
+            #             image={'uri': image_uri},  # Store the URI in the JSONField
+            #         )
+            #         event_image.save()
+            #     else:
+            #         logger.warning(
+            #             f"Image URI is missing for an image in event {event.id}")  # Log warning
 
             return JsonResponse({'message': 'Event and images created successfully'},
                                 status=201)
@@ -306,7 +307,6 @@ def getAllEvents(request, country):
             # Fetch current events by country
             events = Event.objects.filter(country=country).order_by('name')
             events_data = []
-
             for event in events:
                 images = EventImage.objects.filter(event=event)
                 image_uris = [
@@ -332,6 +332,7 @@ def getAllEvents(request, country):
                     'region': event.region,
                     'postal': event.postal_code,
                     'country': event.country,
+                    'photos': event.photos,
                     'price': event.price,
                     'ticket': event.ticket,
                     'date': str(event.date),
