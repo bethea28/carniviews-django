@@ -45,6 +45,7 @@ INSTALLED_APPS = [
     'review_app',
     'suggestion_app',
     "event_app",
+    "band_story_app",
     'feedback_app',
     'company_app', #band app
     'business_app',#for maketplace biz

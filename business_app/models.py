@@ -1,5 +1,4 @@
 from django.db import models
-import json
 from django.conf import settings # Import settings for user model
 from user_app.models import CustomUser  # Import the Company model
 # from company_app.models import Company
