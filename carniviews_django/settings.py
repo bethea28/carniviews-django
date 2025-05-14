@@ -9,6 +9,8 @@ https://docs.djangoproject.com/en/5.1/topics/settings/
 For the full list of settings and their values, see
 https://docs.djangoproject.com/en/5.1/ref/settings/
 """
+import os
+
 from datetime import timedelta
 
 from pathlib import Path
@@ -107,7 +109,7 @@ CORS_ALLOWED_ORIGINS = [
     'exp://192.168.1.161:8081'
     
 ]
-ROOT_URLCONF = 'carniviews-django.urls'
+ROOT_URLCONF = 'carniviews_django.urls'
 
 TEMPLATES = [
     {
@@ -125,7 +127,7 @@ TEMPLATES = [
     },
 ]
 
-WSGI_APPLICATION = 'carniviews-django.wsgi.application'
+WSGI_APPLICATION = 'carniviews_django.wsgi.application'
 
 
 # Database
@@ -139,16 +141,39 @@ WSGI_APPLICATION = 'carniviews-django.wsgi.application'
 # }
 
 
+# DATABASES = {
+#     'default': {
+#         'ENGINE': 'django.db.backends.postgresql',
+#         'NAME': 'carnival3',  # Replace with your local database name
+#         'USER': 'bethea28',  # Replace with your local database user
+#         'PASSWORD': '',  # Replace with your local database user's password
+#         'HOST': 'localhost',  # Or '127.0.0.1'
+#         'PORT': '5432',
+#     }
+# }
+
+
+# DATABASES = {
+#     'default': {
+#         'ENGINE': 'django.db.backends.postgresql',
+#         'NAME': 'carniviews',
+#         'USER': 'carniviews_user',
+#         'PASSWORD': 'secret',
+#         'HOST': 'db',  # Use the service name for Docker networking
+#         'PORT': '5432',
+#     }
+# }
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql',
-        'NAME': 'carnival3',  # Replace with your local database name
-        'USER': 'bethea28',  # Replace with your local database user
-        'PASSWORD': '',  # Replace with your local database user's password
-        'HOST': 'localhost',  # Or '127.0.0.1'
+        'NAME': os.getenv('DB_NAME', 'carniviews'),
+        'USER': os.getenv('DB_USER', 'carniviews_user'),
+        'PASSWORD': os.getenv('DB_PASSWORD', 'secret'),
+        'HOST': os.getenv('DB_HOST', 'localhost'),
         'PORT': '5432',
     }
 }
+
 
 # Password validation
 # https://docs.djangoproject.com/en/5.1/ref/settings/#auth-password-validators

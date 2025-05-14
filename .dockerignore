@@ -1,0 +1,14 @@
+.git
+.gitignore
+__pycache__
+*.pyc
+*.log
+db.sqlite3 # If you're using SQLite
+static/
+media/
+.env
+*.swp
+*~
+venv/
+.venv/
+node_modules/
