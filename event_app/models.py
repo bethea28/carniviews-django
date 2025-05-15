@@ -39,6 +39,7 @@ class Event(models.Model):
         null=True,
         help_text="Zip Code, Postal Code"  # More internationally recognized term
     )
+    claps = models.IntegerField(blank=True, null=True, default=0)
     country = models.CharField(max_length=100)  # Added field to store the company's country
     price = models.CharField(max_length=100)
     date = models.CharField(max_length=50)

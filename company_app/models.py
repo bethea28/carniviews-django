@@ -43,6 +43,7 @@ class Company(models.Model):
     contact = models.CharField(max_length=255, blank=True, null=True)
     website = models.URLField(max_length=255)  # Use URLField
     hoursData = models.JSONField(default=dict)
+    claps = models.IntegerField(blank=True, null=True , default=0)
     description = models.TextField(blank=True, null=True)
     user = models.ForeignKey(CustomUser, on_delete=models.CASCADE, related_name='companies')
     submitted_at = models.DateTimeField(auto_now_add=True)
@@ -99,6 +100,7 @@ class UnverifiedCompany(models.Model):
     hours = models.CharField(max_length=255, blank=True, null=True)
     contact = models.CharField(max_length=255, blank=True, null=True)
     company_type = models.CharField(max_length=100)
+    claps = models.IntegerField(blank=True, null=True, default=0)
     socials =models.JSONField(default=dict)
     photos = models.JSONField(default=dict)
     website = models.URLField(max_length=255)  # Use URLField

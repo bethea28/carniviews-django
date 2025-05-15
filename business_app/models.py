@@ -21,6 +21,7 @@ class Business(models.Model):
         null=True,
         help_text="Zip Code, Postal Code"
     )
+    claps = models.IntegerField(blank=True, null=True, default=0)
     country = models.CharField(max_length=100)
     hours = models.CharField(max_length=255, blank=True, null=True)
     company_type = models.CharField(max_length=100)
@@ -65,6 +66,7 @@ class UnverifiedBusiness(models.Model):
         null=True,
         help_text="Zip Code, Postal Code"
     )
+    claps = models.IntegerField(blank=True, null=True, default=0)
     country = models.CharField(max_length=100)
     hours = models.CharField(max_length=255, blank=True, null=True)
     company_type = models.CharField(max_length=100)

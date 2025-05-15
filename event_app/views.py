@@ -334,6 +334,7 @@ def getAllEvents(request, country):
                     'country': event.country,
                     'photos': event.photos,
                     'price': event.price,
+                    'claps': event.claps,
                     'ticket': event.ticket,
                     'date': str(event.date),
                     'start_time': str(event.start_time),

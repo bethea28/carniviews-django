@@ -290,6 +290,7 @@ def getBusinesses(request, country):
                         # 'contact': business.contact,
                         'country': business.country,
                         'hours': business.hours,
+                        'claps': business.claps,
                         'website': business.website,
                         'company_type': business.company_type,
                         'photos': business.photos,

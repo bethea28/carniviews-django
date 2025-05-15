@@ -208,6 +208,7 @@ def getCompanies(request, country):
                         'postal_code': company.postal_code,
                         'contact': company.contact,
                         'country': company.country,
+                        'claps': company.claps,
                         'hours': company.hours,
                         "website": company.website,
                         'company_type': company.company_type,

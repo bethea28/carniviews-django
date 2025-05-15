@@ -75,6 +75,7 @@ def getBandStories(request, company_id):
             'intro': story.intro,
             'vibe': story.vibe,
             'costume': story.costume,
+            'claps': story.claps,
             'moments': story.moments,
             'reflection': story.reflection,
             'photos': story.photos,

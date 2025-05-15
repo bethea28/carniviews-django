@@ -5,5 +5,6 @@ urlpatterns = [
         # path('<int:user_id>/addVerifiedCompany/', views.addVerifiedCompany, name='add_verified_company'),  # /companies/add/
 
     path('duplicationCheck/', views.duplicationCheck, name='duplication_check'),
+    path('addClaps/', views.addClaps, name='add_claps'),
    
 ]

@@ -13,6 +13,7 @@ class BandStory(models.Model):
     moments = models.TextField(blank=True, null=True)
     reflection = models.TextField(blank=True, null=True)
     photos = models.JSONField(default=dict)
+    claps = models.IntegerField(blank=True, null=True, default=0)
 
     # allImages = models.ManyToManyField('EventImage', blank=True) # Removed EventImage model and using ImageField directly
     

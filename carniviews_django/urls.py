@@ -21,7 +21,7 @@ urlpatterns = [
     path('business/', include('business_app.urls')),
     path('feedback/', include('feedback_app.urls')),
     path('bandStory/', include('band_story_app.urls')),
-    path('duplicates/', include('utils_app.urls')),
+    path('utils/', include('utils_app.urls')),
     path('suggestion/', include('suggestion_app.urls')),
     path('company/', include('company_app.urls')),  # Group under /companies/
     path('bryan/', include('book_app.urls')),

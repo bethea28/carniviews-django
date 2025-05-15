@@ -1,6 +1,10 @@
-from django.shortcuts import render
+from django.db.models import F
 from django.http import JsonResponse
 from django.db import connection
+from company_app.models import Company
+from event_app.models import Event
+from band_story_app.models import BandStory
+from django.shortcuts import get_object_or_404 #import get_object_or_404
 from django.views.decorators.csrf import csrf_exempt
 import json
 
@@ -51,6 +55,47 @@ def duplicationCheck(request):
                 results = [dict(zip(columns, row)) for row in cursor.fetchall()]
 
             return JsonResponse({'results': results})
+
+        except json.JSONDecodeError:
+            return JsonResponse({'error': 'Invalid JSON in request body'}, status=400)
+        except Exception as e:
+            return JsonResponse({'error': str(e)}, status=500)
+    else:
+        return JsonResponse({'error': 'Invalid request method'}, status=405)
+
+@csrf_exempt
+def addClaps(request):
+    if request.method == 'POST':
+        try:
+            data = json.loads(request.body)
+            entity_id = data.get('entity_id')
+            entity_type = data.get('type')
+
+            if not entity_id or not entity_type:
+                return JsonResponse({'error': 'Missing entity_id or type in request body'}, status=400)
+
+            if entity_type == 'company':
+                try:
+                    company = get_object_or_404(Company, id=entity_id)
+                    company.claps = F('claps') + 1
+                    company.save()
+                    print('this my CLAPPING', entity_type, entity_id)
+                    return JsonResponse({'message': 'Clap added successfully to Band'})
+                except Company.DoesNotExist:
+                    return JsonResponse({'error': f'Band with id {entity_id} not found'}, status=404)
+            elif entity_type == 'story':
+                try:
+                    bandStory = get_object_or_404(BandStory, id=entity_id)
+                    print('show me BAND STORY',bandStory, entity_type, entity_id)
+                    # return
+                    bandStory.claps = F('claps') + 1
+                    bandStory.save()
+                    print('this my CLAPPING', entity_type, entity_id)
+                    return JsonResponse({'message': 'Clap added successfully to Story'})
+                except Company.DoesNotExist:
+                    return JsonResponse({'error': f'Company with id {entity_id} not found'}, status=404)
+            else:
+                return JsonResponse({'error': f'Unsupported entity type: {entity_type}'}, status=400)
 
         except json.JSONDecodeError:
             return JsonResponse({'error': 'Invalid JSON in request body'}, status=400)
