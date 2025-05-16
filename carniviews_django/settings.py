@@ -153,26 +153,6 @@ WSGI_APPLICATION = 'carniviews_django.wsgi.application'
 # }
 
 
-# DATABASES = {
-#     'default': {
-#         'ENGINE': 'django.db.backends.postgresql',
-#         'NAME': 'carniviews',
-#         'USER': 'carniviews_user',
-#         'PASSWORD': 'secret',
-#         'HOST': 'db',  # Use the service name for Docker networking
-#         'PORT': '5432',
-#     }
-# }
-# DATABASES = {
-#     'default': {
-#         'ENGINE': 'django.db.backends.postgresql',
-#         'NAME': os.getenv('DB_NAME', 'carniviews'),
-#         'USER': os.getenv('DB_USER', 'carniviews_user'),
-#         'PASSWORD': os.getenv('DB_PASSWORD', 'secret'),
-#         'HOST': os.getenv('DB_HOST', 'localhost'),
-#         'PORT': '5432',
-#     }
-# }
 
 
 DATABASES = {

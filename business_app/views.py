@@ -87,6 +87,7 @@ def addUnverifiedBusiness(request, user_id):
     """
     Creates an UnverifiedBusiness object and associated Image objects from a JSON request body.
     """
+    print('got to unverified')
     if request.method == 'POST':
         try:
             request_data = json.loads(request.body)

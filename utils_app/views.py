@@ -3,6 +3,7 @@ from django.http import JsonResponse
 from django.db import connection
 from company_app.models import Company
 from event_app.models import Event
+from business_app.models import Business
 from band_story_app.models import BandStory
 from django.shortcuts import get_object_or_404 #import get_object_or_404
 from django.views.decorators.csrf import csrf_exempt
@@ -70,7 +71,6 @@ def addClaps(request):
             data = json.loads(request.body)
             entity_id = data.get('entity_id')
             entity_type = data.get('type')
-
             if not entity_id or not entity_type:
                 return JsonResponse({'error': 'Missing entity_id or type in request body'}, status=400)
 
@@ -90,6 +90,28 @@ def addClaps(request):
                     # return
                     bandStory.claps = F('claps') + 1
                     bandStory.save()
+                    print('this my CLAPPING', entity_type, entity_id)
+                    return JsonResponse({'message': 'Clap added successfully to Story'})
+                except Company.DoesNotExist:
+                    return JsonResponse({'error': f'Company with id {entity_id} not found'}, status=404)
+            elif entity_type == 'events':
+                try:
+                    event = get_object_or_404(Event, id=entity_id)
+                    print('THIS IS EVENT IS good', event)
+                    # return
+                    event.claps = F('claps') + 1
+                    event.save()
+                    print('this my CLAPPING', entity_type, entity_id)
+                    return JsonResponse({'message': 'Clap added successfully to Story'})
+                except Company.DoesNotExist:
+                    return JsonResponse({'error': f'Company with id {entity_id} not found'}, status=404)
+            elif entity_type == 'business':
+                try:
+                    business = get_object_or_404(Business, id=entity_id)
+                    print('THIS IS BUSIESS IS good', business)
+                    # return
+                    business.claps = F('claps') + 1
+                    business.save()
                     print('this my CLAPPING', entity_type, entity_id)
                     return JsonResponse({'message': 'Clap added successfully to Story'})
                 except Company.DoesNotExist:
