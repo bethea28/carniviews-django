@@ -18,7 +18,6 @@ class Review(models.Model):
     value = models.FloatField(default=0.0, null=True)
     amenities = models.FloatField(default=0.0, null=True)
     pickup = models.FloatField(default=0.0, null=True)
-    overall = models.FloatField(default=0.0, null=True)
     rating = JSONField(default=list, blank=True, null=True)
     review_date = models.DateTimeField(auto_now_add=True)
 

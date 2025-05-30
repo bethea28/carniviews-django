@@ -26,7 +26,6 @@ def addReview(request, company_id, user_id):
             costume = data.get('costume')
             value = data.get('value')
             service = data.get('service')
-            overall = data.get('overall')
             if not review_text:
                 return JsonResponse({"error": "Review text is required"}, status=400)
 
@@ -36,7 +35,7 @@ def addReview(request, company_id, user_id):
             company = get_object_or_404(Company, id=company_id)
             user = get_object_or_404(CustomUser, id=user_id) #get user object.
 
-            review = Review(overall=overall, review=review_text, music=music, pickup=pickup, service=service, price=price, food=food, vibes=vibes,costume=costume, value=value, amenities=amenities,  company=company, user=user) #add user.
+            review = Review(review=review_text, music=music, pickup=pickup, service=service, price=price, food=food, vibes=vibes,costume=costume, value=value, amenities=amenities,  company=company, user=user) #add user.
             print('this si add review', data)
             # return
             review.save()
