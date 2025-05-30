@@ -48,6 +48,8 @@ def addBandStory(request):
                 photos=photos
             )
             band_story.save()
+            company.bandStories = (company.bandStories or 0) + 1
+            company.save(update_fields=['bandStories'])
             return JsonResponse({'message': 'Band story created successfully!'}, status=201)
 
         except json.JSONDecodeError:

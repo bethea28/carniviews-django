@@ -45,6 +45,8 @@ class Company(models.Model):
     hoursData = models.JSONField(default=dict)
     claps = models.IntegerField(blank=True, null=True , default=0)
     description = models.TextField(blank=True, null=True)
+    bandStories = models.IntegerField(blank=True, null=True, default=0)
+    # overall_avg = models.FloatField(blank=True, null=True, default=0)
     user = models.ForeignKey(CustomUser, on_delete=models.CASCADE, related_name='companies')
     submitted_at = models.DateTimeField(auto_now_add=True)
 
@@ -103,6 +105,8 @@ class UnverifiedCompany(models.Model):
     claps = models.IntegerField(blank=True, null=True, default=0)
     socials =models.JSONField(default=dict)
     photos = models.JSONField(default=dict)
+    bandStories = models.IntegerField(blank=True, null=True, default=0)
+    # overall_avg = models.FloatField(blank=True, null=True, default=0)
     website = models.URLField(max_length=255)  # Use URLField
     hoursData = models.JSONField(default=dict)
     description = models.TextField(blank=True, null=True)

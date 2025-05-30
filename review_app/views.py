@@ -67,6 +67,7 @@ def getReviews(request, company_id):
                 'service',
                 'price',
                 'food',
+                'overall',
                 'value',
                 'amenities',
                 'vibes',
@@ -77,9 +78,18 @@ def getReviews(request, company_id):
                 'id',
                 'displayName'
             )
-
+            # Convert the queryset to a li
             reviews_list = list(reviews)
+            overall_avg = Review.objects.filter(company=company)
+            # average = sum([r.overall for r in overall_avg]) / len(overall_avg)
+            overall_scores = [r.overall for r in overall_avg if r.overall is not None]
 
+            if overall_scores:
+                average = sum(overall_scores) / len(overall_scores)
+            else:
+                average = 0
+
+            print('pussy OVERALL AVG done', overall_scores)    
             # Get all RevAgreements for the reviews at once
             review_ids = [review['id'] for review in reviews_list]
             rev_agreements = RevAgreement.objects.filter(review_id__in=review_ids).values(
@@ -102,8 +112,8 @@ def getReviews(request, company_id):
             for review in reviews_list:
                 review_id = review['id']
                 review['revAgreements'] = agreements_by_review.get(review_id, [])
-
-            return JsonResponse({"reviews": reviews_list})
+            print('this is reviews list', reviews_list)
+            return JsonResponse({"reviews": reviews_list, "overallAvg":average })
         
         except Company.DoesNotExist:
             return JsonResponse({"error": "Company not found"}, status=404)

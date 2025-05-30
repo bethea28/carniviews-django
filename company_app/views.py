@@ -214,6 +214,7 @@ def getCompanies(request, country):
                         'company_type': company.company_type,
                         'photos': company.photos,
                         'description': company.description,
+                        'bandStories': company.bandStories,
                     },
                     'hoursData': company.hoursData,
                     # 'images': [{'id': image.id, 'image_url': image.image_url} for image in company.images.all()]  
