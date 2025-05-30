@@ -1,1 +1,54 @@
-.env
+# Python
+*.pyc
+*.pyo
+__pycache__/
+.Python
+env/
+venv/
+*.env # For .env files if you use python-dotenv
+.python-version # for pyenv
+
+# Django specific
+*.log
+*.sqlite3 # SQLite database files
+media/ # User-uploaded files (if serving locally)
+static_cdn/ # Collected static files for deployment
+/local_settings.py # If you use a separate local settings file not in version control
+/db.sqlite3 # Default SQLite database file (if using SQLite)
+
+# IDEs and Editors
+.idea/ # PyCharm
+.vscode/ # VS Code
+.DS_Store # macOS
+*~ # Emacs, Vim
+*.swp # Vim swap files
+.history/ # VS Code Local History
+
+# Build artifacts
+dist/
+build/
+*.egg-info/
+
+# Pip
+pip-log.txt
+pip-delete-this-directory.txt
+.venv # Common virtual environment name
+
+# Node.js (if using for frontend build)
+node_modules/
+npm-debug.log
+yarn-debug.log
+yarn-error.log
+
+# Docker
+.dockerignore
+
+# Testing
+.coverage
+.pytest_cache/
+htmlcov/
+
+# Other temporary files
+*.bak
+*.tmp
+*.DS_Store
