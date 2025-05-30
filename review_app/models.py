@@ -14,6 +14,7 @@ class Review(models.Model):
     vibes = models.FloatField(default=0.0, null=True)
     costume = models.FloatField(default=0.0, null=True)
     price = models.FloatField(default=0.0, null=True)
+    overall = models.FloatField(default=0.0, null=True)
     food = models.FloatField(default=0.0, null=True)
     value = models.FloatField(default=0.0, null=True)
     amenities = models.FloatField(default=0.0, null=True)
