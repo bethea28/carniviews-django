@@ -8,6 +8,8 @@ from django.contrib.auth.decorators import login_required  # Import login_requir
 from user_app.models import CustomUser
 from django.shortcuts import get_object_or_404 #import get_object_or_404
 from django.db.models import F #field look ups
+from django.db.models import Avg
+
 
 @csrf_exempt
 # @login_required  # Require user to be logged in
@@ -121,7 +123,41 @@ def getReviews(request, company_id):
             return JsonResponse({"error": str(e)}, status=500)
 
     else:
-        return JsonResponse({"error": "Invalid method"}, status=405)
+        return JsonResponse({"error": "Invalid method"}, status=405)\
+       
+
+@csrf_exempt
+def getReviewAvgs(request, company_id):
+    if request.method == "GET":
+        try:
+            # Ensure company exists
+            Company.objects.get(id=company_id)
+
+            # Aggregate averages for each review category
+            category_averages = Review.objects.filter(company_id=company_id).aggregate(
+                music=Avg('music'),
+                service=Avg('service'),
+                price=Avg('price'),
+                food=Avg('food'),
+                overall=Avg('overall'),
+                value=Avg('value'),
+                amenities=Avg('amenities'),
+                vibes=Avg('vibes'),
+                costume=Avg('costume'),
+                pickup=Avg('pickup'),
+            )
+
+            # Round values and set default to 0.0 if None
+            rounded_averages = {k: round(v or 0.0, 2) for k, v in category_averages.items()}
+
+            return JsonResponse(rounded_averages)
+
+        except Company.DoesNotExist:
+            return JsonResponse({"error": "Company not found"}, status=404)
+        except Exception as e:
+            return JsonResponse({"error": str(e)}, status=500)
+
+    return JsonResponse({"error": "Invalid method"}, status=405)
 
     
 @csrf_exempt

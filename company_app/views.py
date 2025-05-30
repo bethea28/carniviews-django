@@ -4,12 +4,14 @@
 # from .models import Company
 # from images_app.models import Image
 # from django.contrib.auth.decorators import login_required  # Import login_required
+from django.db.models import Avg
 
 from django.http import JsonResponse
 from django.views.decorators.csrf import csrf_exempt
 import json
 # from models import Company
 from images_app.models import Image
+from review_app.models import Review
 # from django.contrib.auth.models import User  # Import User model
 from django.shortcuts import get_object_or_404 #import get_object_or_404
 # from user_app.models import Image
@@ -17,14 +19,9 @@ from user_app.models import CustomUser
 from django.db.models import F
 # from models import Recommendation
 
-from django.http import JsonResponse
-from django.views.decorators.csrf import csrf_exempt
 import json
 from .models import UnverifiedCompany, Company, Recommendation
-from images_app.models import Image
-from django.shortcuts import get_object_or_404
 from user_app.models import CustomUser
-from django.db.models import F
 
 @csrf_exempt
 def addUnverifiedCompany(request, user_id):
@@ -196,6 +193,8 @@ def getCompanies(request, country):
             # )
             # print('GET COMPANIES SOCIALS', company)
             for company in companies:
+                overall_avg = company.reviews.aggregate(avg=Avg('overall'))['avg']
+                overall_avg = round(overall_avg, 2) if overall_avg else 0.0
                 company_data = {
                     'id': company.id,
                     'companyInfo': {
@@ -214,6 +213,7 @@ def getCompanies(request, country):
                         'company_type': company.company_type,
                         'photos': company.photos,
                         'description': company.description,
+                        'overall_avg': overall_avg,
                         'bandStories': company.bandStories,
                     },
                     'hoursData': company.hoursData,
